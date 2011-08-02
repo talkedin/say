@@ -102,4 +102,19 @@ class Library_request {
         return $str;
     }
     
+    public function site_name(){
+        
+        $host       = strtolower($_SERVER['HTTP_HOST']);
+        $arr        = explode('.', $host);
+        $max_key    = count($arr) - 1;
+        
+        if( $arr[$max_key -1].'.'.$arr[$max_key] != 'talked.in' )
+            return $host;
+        
+//        if( ! preg_match('/[^a-zA-Z0-9_.-]/', $host) )
+//	    return false;
+        
+        return $arr[0];
+    }
+    
 } // End Request Class
