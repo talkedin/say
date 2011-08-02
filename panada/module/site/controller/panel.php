@@ -6,10 +6,14 @@ class Site_controller_panel extends Panada_module {
         
         parent::__construct();
         
+        $this->session  = new Library_session;
+        $this->db       = new Library_db;
+        $this->site_libs= new Site_library_site_libs;
+        
     }
     
     public function index(){
         
-        echo __METHOD__;
+        $this->output('panel/index');
     }
 }
