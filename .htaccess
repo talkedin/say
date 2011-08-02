@@ -1,0 +1,36 @@
+RewriteEngine on
+
+# Rule untuk request ajax
+# Semau request aja diarahkan ke path
+# /ajax dari path ini akan diredirect
+# controller ajax
+
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule . - [L]
+RewriteRule ^(.*/)?ajax(.*) index.php/ajax [L,QSA]
+
+# Rule jika domainnya bukan talked.in
+RewriteCond %{HTTP_HOST} !^(.*)talked.in
+RewriteRule ^(.*)$ index.php/site/$1 [L]
+
+# Rule jika argument yg tersedia hanya subdomain, tanpa request url.
+RewriteCond %{HTTP_HOST} !^www\.talked.in
+RewriteCond %{HTTP_HOST} ([^.]+)\.talked.in
+RewriteRule ^(.*)$ index.php/site/$1 [L]
+
+# Rule untuk kondisi tanpa subdomain. Kondisi ini digunakan pada
+# feature shrtener, misalnya: http://kompasiana.com/23455
+# atau bisa juga ketika user mengetikan langsung alamat http://kompasiana.com/
+# request ini akan dikirm ke controller subdomain dengan method index
+
+#RewriteCond %{HTTP_HOST} ^talked.in
+#RewriteRule ^(.*)$ index.php?/talked.in/index/$1 [L]
+
+# Kondisi terkahir jika semua kondisi di atas tidak terpenuhi,
+# maka transfer request path ke file index.php untuk diproses sebagia controller.
+
+RewriteCond %{HTTP_HOST} ^www\.talked.in [OR]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php/$1 [L]

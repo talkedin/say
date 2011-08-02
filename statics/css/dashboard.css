@@ -1,0 +1,77 @@
+@charset "UTF-8";
+/* CSS Document */
+
+body {
+    padding:0;
+    margin:0;
+    font: 13px Arial, Helvetica, sans-serif;
+}
+a {
+    color: #1010CE; text-decoration: underline;
+}
+a:hover {
+    text-decoration: underline;
+}
+a:visited {
+    color: #1010CE; text-decoration: underline;
+}
+img {
+    border:0;
+}
+.header {
+    position:relative;
+    min-width:940px;
+    height:35px;
+    border-bottom:1px solid #AFAFAF;
+}
+.wrap_menu {
+    margin-left:auto;
+    margin-right:auto;
+    width:800px;
+    padding-top:7px;
+}
+.float_l {
+    float:left;
+}
+.float_r {
+    float:right;
+}
+.wrap_content{
+    margin-left:auto;
+    margin-right:auto;
+    width:800px;
+}
+.main_menu {
+    border-left:1px solid #AFAFAF;
+    border-bottom:1px solid #AFAFAF;
+    height:100px;
+    width:150px;
+    float:left;
+    padding-top:20px;
+}
+.content{
+    border:1px solid #AFAFAF;
+    border-top:0;
+    height:300px;
+    float:left;
+    width:642px;
+    padding-top:20px;
+}
+input[type="text"], textarea {
+    border:1px solid #AFAFAF;
+    width:300px;
+}
+input[type="button"], input[type="submit"] {
+    background: url("butt2.png") repeat-x scroll left top #F2F2F2;
+    border: 1px solid #BBBBBB;
+    color: #464646;
+    cursor: pointer;
+    font-family: "Lucida Grande",Verdana,Arial,"Bitstream Vera Sans",sans-serif;
+    font-size: 11px !important;
+    font-weight: bold;
+    line-height: 16px;
+    margin: 0;
+    padding: 2px 4px;
+    text-decoration: none;
+    text-shadow: 0 1px 0 #FFFFFF;
+}
