@@ -57,18 +57,10 @@ class Site_controller_alias extends Panada_module {
         
         $name = end($args);
         
-        // Jika sudah tidak ada di table forum, berarti ini adalah thread
-        if( ! $forum = $this->model_forums->find_one( array('site_id' => $this->site_info->site_id, 'name' => $name) ) ){
+        // Jika sudah tidak ada di table forum, beri 404
+        if( ! $forum = $this->model_forums->find_one( array('site_id' => $this->site_info->site_id, 'name' => $name) ) )
+            Library_error::_404();
             
-            if(! isset($args[count($args)-2]) )
-                Library_error::_404();
-            
-            if(! $forum = $this->model_forums->find_one( array('site_id' => $this->site_info->site_id, 'name' => $args[count($args)-2]) ) )
-                Library_error::_404();
-            
-            $this->thread($name, $forum);
-            return;
-        }
         
         // Waktunya untuk menampilkan list thread jika is_parent-nya sudah 0
         if($forum->is_parent == 0){
