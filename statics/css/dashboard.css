@@ -52,10 +52,10 @@ img {
 .content{
     border:1px solid #AFAFAF;
     border-top:0;
-    height:300px;
+    min-height:300px;
     float:left;
     width:642px;
-    padding-top:20px;
+    padding:20px 0 20px;
 }
 input[type="text"], textarea {
     border:1px solid #AFAFAF;

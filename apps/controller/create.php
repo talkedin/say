@@ -25,11 +25,11 @@ class Controller_create extends Panada {
             $data['visibility']     = $this->requst->post('visibility');
             $data['create_date']    = date('Y-m-d H:i:s');
             
-            $this->db->insert('forums', $data);
+            $this->db->insert('sites', $data);
             
             $this->redirect( 'create?done&forum_id='.$this->db->insert_id() );
         }
         
-        $this->output('dashboard/forum_create', $views);
+        $this->output('dashboard/site_create', $views);
     }
 }

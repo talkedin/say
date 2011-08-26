@@ -10,15 +10,23 @@ class Site_controller_home extends Panada_module {
         
         $this->session          = new Library_session;
         $this->db               = new Library_db;
-        $this->curent_location  = urlencode('http://' .$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
         $this->request          = new Library_request;
-        $this->site_libs        = new Site_library_site_libs;
+        $this->library_site     = new Site_library_site;
+        $this->model_forums     = new Site_model_forums;
+        $this->model_site_info  = new Site_model_site_info;
     }
     
     public function index(){
         
-        if( ! $views['site'] = $this->db->find_one('sites', array('name' => $this->site_libs->site_name(), 'status' => 1)) )
+        if( ! $views['site'] = $this->model_site_info->data() )
             Library_error::_404();
+        
+        $views['forums'] = $this->model_forums->find_all(
+                                                        array(
+                                                            'site_id' => (int) $views['site']->site_id,
+                                                            //'parent_id' => 0
+                                                        )
+                                                    );
         
         $this->output('template/index', $views);
     }

@@ -13,7 +13,7 @@
             <span>Home</span>
         </div>
         <div class="float_r">
-            <span><strong><?php echo $this->session->get('username');?></strong> | <a href="<?php echo $this->location('signout?next='.$this->site_libs->location());?>">Sign Out</a></span>
+            <span><strong><?php echo $this->session->get('username');?></strong> | <a href="<?php echo $this->library_site->location();?>">View Site</a> | <a href="<?php echo $this->location();?>">Dashboard</a> | <a href="<?php echo $this->location('signout?next='.$this->library_site->location());?>">Sign Out</a></span>
         </div>
     </div>
 </div>

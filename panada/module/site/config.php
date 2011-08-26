@@ -14,6 +14,6 @@ $CONFIG = array(
      * Define the 'controller_name' => 'method_name' if you
      * want implement alias controller feature in this module.
      */
-    'alias_controller' => array(),
+    'alias_controller' => array('alias' => 'index'),
     
 );
