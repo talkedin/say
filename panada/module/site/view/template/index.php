@@ -29,13 +29,13 @@
                 <?php if( $forum->parent_id == 0 ): ?>
                     <div class="main_box_wraper">
                         <div class="main_box_header">
-                            <a href="<?php echo $this->library_site->location($forum->name);?>"><?php echo $forum->title;?></a>
+                            <a href="<?php echo $this->library_site->location('forum/'.$forum->name);?>"><?php echo $forum->title;?></a>
                         </div>
                         <?php if($forum->is_parent == 1):?>
                             <?php foreach($sub_forums as $sub_forum): ?>
                                 <?php if($sub_forum->parent_id == $forum->forum_id): ?>
                                 <div class="main_box_lists">
-                                    <h4><a href="<?php echo $this->library_site->location($forum->name.'/'.$sub_forum->name);?>"><?php echo $sub_forum->title;?></a></h4>
+                                    <h4><a href="<?php echo $this->library_site->location('forum/'.$forum->name.'/'.$sub_forum->name);?>"><?php echo $sub_forum->title;?></a></h4>
                                     <p>
                                     <?php echo $sub_forum->description;?>
                                     </p>

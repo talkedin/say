@@ -36,7 +36,7 @@
             </div>
             <?php foreach($sub_forums as $sub_forum): ?>
             <div class="main_box_lists">
-                <h4><a href="<?php echo $this->library_site->location($forum->name.'/'.$sub_forum->name);?>"><?php echo $sub_forum->title;?></a></h4>
+                <h4><a href="<?php echo $this->library_site->location('forum/'.$forum->name.'/'.$sub_forum->name);?>"><?php echo $sub_forum->title;?></a></h4>
                 <p>
                 bagaimana kalo untuk pada bagian2 driver dibuat interfacenya.. biar ada panduan penamaan dan konsistensi driver lebih baik
                 </p>
