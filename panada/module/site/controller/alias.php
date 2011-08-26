@@ -30,7 +30,7 @@ class Site_controller_alias extends Panada_module {
         
         // Jika format urlnya lengkap dengan tahun, bulan, tanggal dan name, maka ini adalah
         // detail thread.
-        if( isset($args[2], $args[1]) && checkdate($args[1], $args[2], $args[0]) ){
+        if( isset($args[2], $args[1]) && ( is_numeric($args[1]) && is_numeric($args[2]) && is_numeric($args[0]) ) ){
             $this->thread($args);
             return;
         }

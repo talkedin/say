@@ -17,7 +17,7 @@ class Site_library_site {
         return $arr[0];
     }
     
-    public function location($location = ''){
+    public function location($location = '', $is_rtrim = false, $trim_str = '/'){
         
         $validation = new Library_validation;
         $site_name  = $this->site_name();
@@ -28,6 +28,9 @@ class Site_library_site {
             $url = 'http://'.$site_name.'.talked.in/';
         
         $url .= $location;
+        
+        if($is_rtrim)
+            return rtrim($url, $trim_str);
         
         return $url;
     }

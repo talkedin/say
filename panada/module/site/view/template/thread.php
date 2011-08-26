@@ -31,7 +31,7 @@
                 <a href="<?php echo $this->library_site->location();?>">Forums</a>
                 <?php $name = '';?>
                 <?php foreach($bredcump as $key => $title): ?>
-                    <?php $name .= $key.'/'; ?>
+                    <?php $name .= '/'.$key; ?>
                     > <a href="<?php echo $this->library_site->location($name);?>"><?php echo $title;?></a>
                 <?php endforeach; ?>
                 > <?php echo $thread_title;?>
