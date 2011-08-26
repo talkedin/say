@@ -9,7 +9,6 @@ class Site_controller_alias extends Panada_module {
         parent::__construct();
         
         $this->session          = new Library_session;
-        $this->db               = new Library_db;
         $this->request          = new Library_request;
         $this->library_site     = new Site_library_site;
         $this->model_forums     = new Site_model_forums;

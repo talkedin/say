@@ -17,7 +17,7 @@ class Site_library_site {
         return $arr[0];
     }
     
-    public function location($location = '', $is_rtrim = false, $trim_str = '/'){
+    public function location($location = '', $is_rtrim = true, $trim_str = '/'){
         
         $validation = new Library_validation;
         $site_name  = $this->site_name();

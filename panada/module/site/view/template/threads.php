@@ -28,7 +28,7 @@
         <div class="main_box_wraper">
             <div class="main_box_header">
                 <a href="<?php echo $this->library_site->location();?>">Forums</a>
-                <?php $name = '';?>
+                <?php $name = 'forum/';?>
                 <?php foreach($bredcump as $key => $title): ?>
                     <?php $name .= $key.'/'; ?>
                     > <a href="<?php echo $this->library_site->location($name);?>"><?php echo $title;?></a>
