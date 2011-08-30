@@ -18,6 +18,24 @@ class Site_controller_alias extends Panada_module {
     
     public function index(){
         
+        /*
+         Paging array
+        $array = array(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17);
+        
+        $limit = 5;
+        $page = 4;
+        $total = count($array);
+        $offset = ($limit * $page) - $limit;
+        
+        print_r($array);
+        
+        echo '<br /><br />';
+        
+        print_r( array_slice($array, $offset, $limit) );
+        
+        exit;
+        */
+        
         $args = func_get_args();
         $total = count($args);
         
@@ -37,6 +55,9 @@ class Site_controller_alias extends Panada_module {
         Library_error::_404();
     }
     
+    /**
+     * Penggunaan databasenya masih perlu di tuning 021-41442217
+     */
     private function thread( $args ){
         
         $this->formatting   = new Library_formatting;
@@ -67,13 +88,43 @@ class Site_controller_alias extends Panada_module {
             Library_error::_404();
         
         $views['site']      = $this->site_info;
-        $views['curent_url']= $this->library_site->thread_url( $views['thread'] );
+        $views['curent_url']= $curent_url = $this->library_site->thread_url( $views['thread'] );
         
-        if( isset($args[4]) && $args[4] > 0 )
+        $page = 1;
+        
+        if( isset($args[4]) && $args[4] > 0 ){
             $views['curent_url'] .= '/'.$args[4];
+            $page = $args[4];
+        }
+        
+        $this->pagination       = new Library_pagination;
+        
+        $criteria = array(
+                    'site_id' => $this->site_info->site_id,
+                    'thread_id' => $views['thread']->thread_id,
+                    'forum_id' => $views['thread']->forum_id,
+                    'page' => $page,
+                    'limit' => 5,
+                );
+        
+        $views['replies']       = $this->build_replies($criteria, $views['curent_url']);//$this->model_replies->find_all($criteria);
+        //print_r($views['replies']);exit;
+        $this->pagination->limit= 5;
+        $this->pagination->base = $curent_url.'/%#%';
+	$this->pagination->total= $this->model_replies->find_total($criteria);
+	$this->pagination->current= $page;
+        $this->pagination->no_href = true;
+        $this->pagination->prev_next = false;
+        
+        $views['page_links']    = $this->pagination->get_url();
         
         if( $this->request->post('submit') ){
             
+            // Belum login? bawa ke halaman login dulu
+            if( ! $this->session->get('user_id') )
+                $this->redirect( 'signin?next=' . urlencode($views['curent_url']) );
+            
+            // Siapkan data yg akan disimpan ke database
             $post['author_id']  = $this->session->get('user_id');
             $post['thread_id']  = $views['thread']->thread_id;
             $post['forum_id']   = $views['thread']->forum_id;
@@ -81,8 +132,14 @@ class Site_controller_alias extends Panada_module {
             $post['date']       = date('Y-m-d H:i:s');
             $post['content']    = $this->request->post('content');
             
+            // Redirect jika berhasil insert
             if( $this->model_replies->add_new($post) ){
-                $this->redirect( $views['curent_url'].'?replied#reply' );
+                
+                $this->pagination->total= $this->model_replies->find_total($criteria);
+                $page_links             = $this->pagination->get_url();
+                $end_page               = end($page_links);
+                
+                $this->redirect( $end_page['link'].'?replied#reply' );
             }
         }
         
@@ -94,5 +151,34 @@ class Site_controller_alias extends Panada_module {
         
         $this->output('template/thread', $views);
         
+    }
+    
+    private function build_replies($criteria, $curent_url){
+        
+        $replies = $this->model_replies->find_all($criteria);
+        
+        foreach($replies as $key => $obj){
+            
+            $replies[$key]->sub_replies = false;
+            
+            if($obj->total_replied > 0){
+                
+                $criteria['parent_id'] = $obj->reply_id;
+                $criteria['page'] = 1;
+                $criteria['limit'] = 2;
+                
+                $replies[$key]->sub_replies = $this->model_replies->find_all($criteria);
+                
+                $this->pagination->limit= 2;
+                $this->pagination->base = $curent_url.'/'.$obj->reply_id.'/%#%';
+                $this->pagination->total= $obj->total_replied;
+                $this->pagination->current= 1;
+                $this->pagination->no_href = true;
+                $this->pagination->prev_next = false;
+                $replies[$key]->page_links = $this->pagination->get_url();
+            }
+        }
+        
+        return $replies;
     }
 }
