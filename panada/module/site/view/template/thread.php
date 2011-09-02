@@ -32,7 +32,7 @@
         <div class="thread_reply">
             <a href="#reply">Reply</a> | <a href="report/">Report</a>
         </div>
-        
+        <a name="replies"></a>
         <?php if($replies): ?>
         <?php foreach($replies as $replies): ?>
             <div class="main_box_wraper" id="p<?php echo $replies->reply_id;?>">
@@ -92,16 +92,16 @@
                         <?php endif; ?>
                         
                         <?php if($post_form == $replies->reply_id): ?>
-                        <div class="main_box_wraper form_box" id="reply<?php echo $replies->reply_id; ?>">
+                        <div class="main_box_wraper form_box" id="form<?php echo $replies->reply_id; ?>">
                             <div style="padding:5px;">
-                                <strong>Reply this thread</strong>
-                                <div class="fRight"><a href="#">Write</a> | <a href="#">Preview</a></div>
+                                <strong>Reply this post</strong>
                             </div>
                             <div class="form_wrap">
                                 <form action="" method="post">
                                     <textarea name="content"></textarea>
                                     <br /><br />
-                                    <input type="submit" value="submit" name="submit" />
+                                    <input type="hidden" name="f" value="c" />
+                                    <input type="submit" value="submit" name="submit" /> <input type="submit" value="Preview" name="preview" />
                                 </form>
                             </div>
                         </div>
@@ -131,22 +131,42 @@
             </ul>
             <?php endif;?>
         </div>
-       
         
+        <?php if($reply_preview): ?>
+        <div id="reply" class="main_box_wraper" style="margin-top: 30px;">
+            <div class="main_box_header">
+                Post Preview
+            </div>
+            <div class="clearfix main_box_lists">
+                <div class="thread_usr_info">
+                    <a href="http://talked.in/iskandar">
+                        <img alt="Kandar" src="http://www.gravatar.com/avatar/b43a722e4a4f91ef193fbe18bb659f5d.jpg?s=48&amp;d=mm">
+                    </a>
+                </div>
+                <div class="thread_content">
+                    <span class="author"><a href="http://talked.in/iskandar">Iskandar Soesman</a></span>
+                    <?php echo $reply_preview;?>
+                    <div class="mt10">
+                        <input type="submit" value="Post" name="submit" /> <input type="submit" value="Edit" name="edit" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <?php else: ?>
         <div class="main_box_wraper form_box" id="reply">
             <div style="padding:5px;">
                 <strong>Reply this thread</strong>
-                <div class="fRight"><a href="#">Write</a> | <a href="#">Preview</a></div>
             </div>
             <div class="form_wrap">
-                <form action="" method="post">
+                <form action="#reply" method="post">
                     <textarea name="content"></textarea>
                     <br /><br />
-                    <input type="submit" value="submit" name="submit" />
+                    <input type="hidden" name="f" value="p" />
+                    <input type="submit" value="Post" name="submit" /> <input type="submit" value="Preview" name="preview" />
                 </form>
             </div>
         </div>
-        
+        <?php endif; ?>
     </div>
 
 <?php $this->output('template/footer'); ?>

@@ -163,3 +163,14 @@ img {
 .fRight {
     float:right;
 }
+
+pre {
+    background-color:#F5F5F5;
+    border:1px solid #CCCCCC;
+    color:#444444;/*#002166;*/
+    display:block;
+    font-family:Monaco,Verdana,Sans-serif;
+    font-size:12px;
+    margin:14px 0;
+    padding:12px 10px;
+}

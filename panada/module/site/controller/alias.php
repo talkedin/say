@@ -83,29 +83,37 @@ class Site_controller_alias extends Panada_module {
         $this->pagination       = new Library_pagination;
         
         $criteria = array(
-                    'site_id' => $this->site_info->site_id,
+                    'site_id'   => $this->site_info->site_id,
                     'thread_id' => $views['thread']->thread_id,
-                    'forum_id' => $views['thread']->forum_id,
-                    'page' => $page,
-                    'limit' => 5,
+                    'forum_id'  => $views['thread']->forum_id,
+                    'page'      => $page,
+                    'limit'     => 5,
                 );
         
-        $views['replies']       = $this->build_replies($criteria, $curent_url);//$this->model_replies->find_all($criteria);
-       
-        $this->pagination->limit= $criteria['limit'];
-        $this->pagination->base = $curent_url.'/%#%';
-	$this->pagination->total= $views['thread']->total_replied_parent;//$this->model_replies->find_total($criteria);
-	$this->pagination->current= $page;
-        $this->pagination->no_href = true;
-        $this->pagination->prev_next = false;
+        $views['replies']           = $this->build_replies($criteria, $curent_url);//$this->model_replies->find_all($criteria);
+        $this->pagination->limit    = $criteria['limit'];
+        $this->pagination->base     = $curent_url.'/%#%#replies';
+	$this->pagination->total    = $views['thread']->total_replied_parent;//$this->model_replies->find_total($criteria);
+	$this->pagination->current  = $page;
+        $this->pagination->no_href  = true;
+        $this->pagination->prev_next= false;
         
         $views['page_links']    = $this->pagination->get_url();
+        
+        $views['reply_preview'] = false;
+        if( $this->request->post('preview') ){
+            
+            $views['reply_preview'] = $this->posts_lib->the_content($this->request->post('content'));
+            //die($views['reply_preview']);
+            
+        }
         
         if( $this->request->post('submit') ){
             
             // Belum login? bawa ke halaman login dulu
             if( ! $this->session->get('user_id') )
                 $this->redirect( 'signin?next=' . urlencode($views['curent_url']) );
+            
             
             // Siapkan data yg akan disimpan ke database
             $post['author_id']  = $this->session->get('user_id');
@@ -124,6 +132,7 @@ class Site_controller_alias extends Panada_module {
                 
                 $this->redirect( $end_page['link'].'?replied#reply' );
             }
+            
         }
         
         $views['thread_title']  = $this->posts_lib->filters_the_title($views['thread']->title);
@@ -154,7 +163,7 @@ class Site_controller_alias extends Panada_module {
         foreach($replies as $key => $obj){
             
             $replies[$key]->sub_replies = false;
-            $replies[$key]->post_reply  = $curent_url.'/'.$this->url_args[4].'/reply/'.$obj->reply_id.'/1/post#reply'.$obj->reply_id;
+            $replies[$key]->post_reply  = $curent_url.'/'.$this->url_args[4].'/reply/'.$obj->reply_id.'/1/post#form'.$obj->reply_id;
             
             if($obj->total_replied > 0){
                 
@@ -204,15 +213,15 @@ class Site_controller_alias extends Panada_module {
         if( $return->page_links = $this->pagination->get_url() ){
             
             $post_reply         = end($return->page_links);
-            $return->post_reply = $curent_url.'/'.$this->url_args[4].'/reply/'.$obj->reply_id.'/'.$post_reply['value'].'/post#reply'.$obj->reply_id;
+            $return->post_reply = $curent_url.'/'.$this->url_args[4].'/reply/'.$obj->reply_id.'/'.$post_reply['value'].'/post#form'.$obj->reply_id;
             
             if( $post_reply['value'] != $criteria['page'] ){
                 
                 $post_reply             = $post_reply['link'];
                 $parse_url              = parse_url($post_reply);
                 $parse_url['path']      = $parse_url['path'].'/post';
-                $parse_url['fragment']  = 'reply'.$obj->reply_id;
-                $return->post_reply = $parse_url['scheme'].'://'.$parse_url['host'].'/'.$parse_url['path'].'#'.$parse_url['fragment'];
+                $parse_url['fragment']  = 'form'.$obj->reply_id;
+                $return->post_reply = $parse_url['scheme'].'://'.$parse_url['host'].$parse_url['path'].'#'.$parse_url['fragment'];
             }
         }
         
