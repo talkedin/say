@@ -19,24 +19,6 @@ class Site_controller_alias extends Panada_module {
     
     public function index(){
         
-        /*
-         Paging array
-        $array = array(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17);
-        
-        $limit = 5;
-        $page = 4;
-        $total = count($array);
-        $offset = ($limit * $page) - $limit;
-        
-        print_r($array);
-        
-        echo '<br /><br />';
-        
-        print_r( array_slice($array, $offset, $limit) );
-        
-        exit;
-        */
-        
         $this->url_args = func_get_args();
         $total = count($this->url_args);
         
@@ -232,9 +214,6 @@ class Site_controller_alias extends Panada_module {
                 $parse_url['fragment']  = 'reply'.$obj->reply_id;
                 $return->post_reply = $parse_url['scheme'].'://'.$parse_url['host'].'/'.$parse_url['path'].'#'.$parse_url['fragment'];
             }
-            
-            
-            
         }
         
         return $return;
