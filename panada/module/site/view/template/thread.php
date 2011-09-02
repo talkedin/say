@@ -35,7 +35,7 @@
         
         <?php if($replies): ?>
         <?php foreach($replies as $replies): ?>
-            <div class="main_box_wraper">
+            <div class="main_box_wraper" id="p<?php echo $replies->reply_id;?>">
                 <div class="main_box_header">
                     <?php echo $this->formatting->mysql2date($replies->date, 'd M Y H:i A');?>
                 </div>
@@ -50,7 +50,7 @@
                         <?php echo $this->posts_lib->the_content($replies->content);?>
                         
                         <div class="mt10">
-                            <a href="#reply">Reply</a> | <a href="report/">Report</a>
+                            <a href="<?php echo $replies->post_reply;?>">Reply</a><!-- | <a href="report/">Report</a>-->
                         </div>
                         
                         <?php if($replies->sub_replies): ?>
@@ -63,14 +63,11 @@
                                     </a>
                                 </div>
                                 <div class="thread_content_replied">
-                                    <h4><a href="http://panada.talked.in/general-disucission/programming-to-interface/">Programming to interface</a></h4>
-                                    <span class="author"><a href="http://talked.in/iskandar">Iskandar Soesman</a> - 11 Aug 2011 12:04 AM</span>
-                                    <p>
-                                    bagaimana kalo untuk pada bagian2 driver dibuat interfacenya.. biar ada panduan penamaan dan konsistensi driver lebih baik bagaimana kalo untuk pada bagian2 driver dibuat interfacenya.. biar ada panduan penamaan dan konsistensi driver lebih baik
-                                    </p>
+                                    <span class="author"><a href="http://talked.in/iskandar">Iskandar Soesman</a> - <?php echo $this->formatting->mysql2date($sub_replies->date, 'd M Y H:i A');?></span>
+                                    <?php echo $this->posts_lib->the_content($sub_replies->content);?>
                                     
                                     <div class="mt10">
-                                        <a href="#reply">Reply</a> | <a href="report/">Report</a>
+                                        <a href="<?php echo $replies->post_reply;?>">Reply</a><!-- | <a href="report/">Report</a>-->
                                     </div>
                                 </div>
                             </div>
@@ -81,7 +78,7 @@
                                 <?php foreach($replies->page_links as $paging):?>
                                     <li>
                                         <?php if( empty($paging['link']) ): ?>
-                                        <a href="" class="selected"><?php echo $paging['value'];?></a>
+                                        <a class="selected"><?php echo $paging['value'];?></a>
                                         <?php else: ?>
                                         <a href="<?php echo $paging['link'];?>"><?php echo $paging['value'];?></a>
                                         <?php endif; ?>
@@ -90,6 +87,23 @@
                                 </ul>
                             </div>
                             <?php endif;?>
+                            
+                        </div>
+                        <?php endif; ?>
+                        
+                        <?php if($post_form == $replies->reply_id): ?>
+                        <div class="main_box_wraper form_box" id="reply<?php echo $replies->reply_id; ?>">
+                            <div style="padding:5px;">
+                                <strong>Reply this thread</strong>
+                                <div class="fRight"><a href="#">Write</a> | <a href="#">Preview</a></div>
+                            </div>
+                            <div class="form_wrap">
+                                <form action="" method="post">
+                                    <textarea name="content"></textarea>
+                                    <br /><br />
+                                    <input type="submit" value="submit" name="submit" />
+                                </form>
+                            </div>
                         </div>
                         <?php endif; ?>
                     </div>
@@ -216,7 +230,7 @@
             <?php foreach($page_links as $paging):?>
                 <li>
                     <?php if( empty($paging['link']) ): ?>
-                    <a href="" class="selected"><?php echo $paging['value'];?></a>
+                    <a class="selected"><?php echo $paging['value'];?></a>
                     <?php else: ?>
                     <a href="<?php echo $paging['link'];?>"><?php echo $paging['value'];?></a>
                     <?php endif; ?>

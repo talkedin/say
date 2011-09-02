@@ -3,6 +3,7 @@
 class Site_controller_alias extends Panada_module {
     
     private $site_info;
+    private $url_args = array();
     
     public function __construct(){
         
@@ -36,8 +37,8 @@ class Site_controller_alias extends Panada_module {
         exit;
         */
         
-        $args = func_get_args();
-        $total = count($args);
+        $this->url_args = func_get_args();
+        $total = count($this->url_args);
         
         if( $total < 1 )
             Library_error::_404();
@@ -47,8 +48,8 @@ class Site_controller_alias extends Panada_module {
         
         // Jika format urlnya lengkap dengan tahun, bulan, tanggal dan name, maka ini adalah
         // detail thread.
-        if( isset($args[2], $args[1]) && ( is_numeric($args[1]) && is_numeric($args[2]) && is_numeric($args[0]) ) ){
-            $this->thread($args);
+        if( isset($this->url_args[2], $this->url_args[1]) && ( is_numeric($this->url_args[1]) && is_numeric($this->url_args[2]) && is_numeric($this->url_args[0]) ) ){
+            $this->thread();
             return;
         }
         
@@ -58,14 +59,14 @@ class Site_controller_alias extends Panada_module {
     /**
      * Penggunaan databasenya masih perlu di tuning 021-41442217
      */
-    private function thread( $args ){
+    private function thread(){
         
         $this->formatting   = new Library_formatting;
         $this->posts_lib    = new Library_posts;
         $this->model_replies= new Site_model_replies;
         
-        $name               = urlencode(urldecode(strtolower($args[3])));
-        $date               = $this->formatting->date2mysql($args[1], $args[2], $args[0]);
+        $name               = urlencode(urldecode(strtolower($this->url_args[3])));
+        $date               = $this->formatting->date2mysql($this->url_args[1], $this->url_args[2], $this->url_args[0]);
         $views['thread']    = $this->model_threads->find_one(
                                             array(
                                                 'site_id' => (int) $this->site_info->site_id,
@@ -92,9 +93,9 @@ class Site_controller_alias extends Panada_module {
         
         $page = 1;
         
-        if( isset($args[4]) && $args[4] > 0 ){
-            $views['curent_url'] .= '/'.$args[4];
-            $page = $args[4];
+        if( isset($this->url_args[4]) && $this->url_args[4] > 0 ){
+            $views['curent_url'] .= '/'.$this->url_args[4];
+            $page = $this->url_args[4];
         }
         
         $this->pagination       = new Library_pagination;
@@ -107,11 +108,11 @@ class Site_controller_alias extends Panada_module {
                     'limit' => 5,
                 );
         
-        $views['replies']       = $this->build_replies($criteria, $views['curent_url']);//$this->model_replies->find_all($criteria);
-        //print_r($views['replies']);exit;
-        $this->pagination->limit= 5;
+        $views['replies']       = $this->build_replies($criteria, $curent_url);//$this->model_replies->find_all($criteria);
+       
+        $this->pagination->limit= $criteria['limit'];
         $this->pagination->base = $curent_url.'/%#%';
-	$this->pagination->total= $this->model_replies->find_total($criteria);
+	$this->pagination->total= $views['thread']->total_replied_parent;//$this->model_replies->find_total($criteria);
 	$this->pagination->current= $page;
         $this->pagination->no_href = true;
         $this->pagination->prev_next = false;
@@ -149,36 +150,93 @@ class Site_controller_alias extends Panada_module {
         $views['thread_content']= $this->posts_lib->the_content($views['thread']->content);
         $views['bredcump']      = $this->model_forums->bredcump($this->site_info->site_id, $forum->forum_id);
         
+        $views['post_form']     = 0;
+        if( isset($this->url_args[8]) && $this->url_args[8] == 'post' ){
+            $views['post_form'] = $this->url_args[6];
+        }
+        
         $this->output('template/thread', $views);
         
     }
     
     private function build_replies($criteria, $curent_url){
         
-        $replies = $this->model_replies->find_all($criteria);
+        if( ! isset($this->url_args[4]) )
+            $this->url_args[4] = 1;
         
+        //print_r($this->url_args);exit;
+        if( ! $replies = $this->model_replies->find_all($criteria) )
+            return false;
+        
+        // Tambahkan setiap object dengan reply dan paginnya, jika ada
         foreach($replies as $key => $obj){
             
             $replies[$key]->sub_replies = false;
+            $replies[$key]->post_reply  = $curent_url.'/'.$this->url_args[4].'/reply/'.$obj->reply_id.'/1/post#reply'.$obj->reply_id;
             
             if($obj->total_replied > 0){
                 
-                $criteria['parent_id'] = $obj->reply_id;
-                $criteria['page'] = 1;
-                $criteria['limit'] = 2;
-                
-                $replies[$key]->sub_replies = $this->model_replies->find_all($criteria);
-                
-                $this->pagination->limit= 2;
-                $this->pagination->base = $curent_url.'/'.$obj->reply_id.'/%#%';
-                $this->pagination->total= $obj->total_replied;
-                $this->pagination->current= 1;
-                $this->pagination->no_href = true;
-                $this->pagination->prev_next = false;
-                $replies[$key]->page_links = $this->pagination->get_url();
+                $sub = $this->build_sub_replies($obj, $criteria, $curent_url);
+                $replies[$key]->sub_replies = $sub->sub_replies;
+                $replies[$key]->page_links  = $sub->page_links;
+                $replies[$key]->post_reply  = $sub->post_reply;
             }
         }
         
         return $replies;
+    }
+    
+    /**
+     * bagian ini sepertinya  bisa dicache
+     */
+    private function build_sub_replies($obj, $criteria, $curent_url){
+        
+        $return = new stdClass;
+        
+        // Pastikan key-key yang dibutuhkan tersedia
+        if( ! isset($this->url_args[5]) ){
+            $this->url_args[5] = 'reply';
+            $this->url_args[6] = 1;
+            $this->url_args[7] = 1;
+        }
+        
+        $criteria['parent_id']      = $obj->reply_id;
+        $criteria['limit']          = 1;
+        $criteria['page']           = 1;
+        $this->pagination->limit    = $criteria['limit'];
+        $this->pagination->base     = $curent_url.'/'.$this->url_args[4].'/reply/'.$obj->reply_id.'/%#%#p'.$obj->reply_id;
+        $this->pagination->current  = $criteria['page'];
+        
+        if( $this->url_args[7] > 1 && $obj->reply_id == $this->url_args[6] ){
+            $criteria['page']           = $this->url_args[7];
+            $this->pagination->base     = $curent_url.'/'.$this->url_args[4].'/reply/'.$obj->reply_id.'/%#%#p'.$obj->reply_id;
+            $this->pagination->current  = $criteria['page'];
+        }
+        
+        $return->sub_replies = $this->model_replies->find_all($criteria);
+        $this->pagination->total    = $obj->total_replied;
+        
+        $this->pagination->no_href  = true;
+        $this->pagination->prev_next= false;
+        
+        if( $return->page_links = $this->pagination->get_url() ){
+            
+            $post_reply         = end($return->page_links);
+            $return->post_reply = $curent_url.'/'.$this->url_args[4].'/reply/'.$obj->reply_id.'/'.$post_reply['value'].'/post#reply'.$obj->reply_id;
+            
+            if( $post_reply['value'] != $criteria['page'] ){
+                
+                $post_reply             = $post_reply['link'];
+                $parse_url              = parse_url($post_reply);
+                $parse_url['path']      = $parse_url['path'].'/post';
+                $parse_url['fragment']  = 'reply'.$obj->reply_id;
+                $return->post_reply = $parse_url['scheme'].'://'.$parse_url['host'].'/'.$parse_url['path'].'#'.$parse_url['fragment'];
+            }
+            
+            
+            
+        }
+        
+        return $return;
     }
 }
