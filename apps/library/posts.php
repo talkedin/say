@@ -49,7 +49,7 @@ class Library_posts {
 	$content    = $this->shortcodes->do_shortcode($content);
 	$content    = $this->formatting->wpautop($content);
 	$content    = $this->formatting->wptexturize($content);
-	$content    = $this->pre($content);
+	//$content    = $this->pre($content);
 	//die($content);
 	
 	return $content;
@@ -67,7 +67,7 @@ class Library_posts {
      * Originally from David Walsh
      * @link http://davidwalsh.name/php-html-entities
      */
-    private function pre($content){
+    public function pre($content){
 	
 	//replaces pre content with html entities
 	//to html entities;  assume content is in the "content" variable

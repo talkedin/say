@@ -45,6 +45,7 @@ class Site_controller_alias extends Panada_module {
         
         $this->formatting   = new Library_formatting;
         $this->posts_lib    = new Library_posts;
+        $this->write_lib    = new Library_write;
         $this->model_replies= new Site_model_replies;
         
         $name               = urlencode(urldecode(strtolower($this->url_args[3])));
@@ -103,8 +104,8 @@ class Site_controller_alias extends Panada_module {
         $views['reply_preview'] = false;
         if( $this->request->post('preview') ){
             
-            $views['reply_preview'] = $this->posts_lib->the_content($this->request->post('content'));
-            //die($views['reply_preview']);
+            $views['reply_preview'] = $this->write_lib->sanitize_post_content($this->request->post('content'));
+            $views['reply_preview'] = $this->posts_lib->the_content($views['reply_preview']);
             
         }
         

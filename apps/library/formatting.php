@@ -444,6 +444,8 @@ class Library_formatting {
 	$text = str_replace('< !--', '<    !--', $text);
 	# WP bug fix for LOVE <3 (and other situations with '<' before a number)
 	$text = preg_replace('#<([0-9]{1})#', '&lt;$1', $text);
+	// Bug fix for php tag
+	$text = str_ireplace( array('<?php', '<?'), array('&lt;?php', '&lt;?'), $text);
 
 	while (preg_match("/<(\/?\w*)\s*([^>]*)>/",$text,$regex)) {
 		$newtext .= $tagqueue;

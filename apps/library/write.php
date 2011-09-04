@@ -38,9 +38,22 @@ class Library_write {
      */
     public function sanitize_post_content($content){
         
+	$this->kses = new Library_kses;
+	$this->posts_lib    = new Library_posts;
+	
+	$this->kses->allowed_html = array(
+	    'pre' => array(
+			'style' => array(),
+			'width' => array (),
+			'lang' => array(),
+		    ),
+	);
+	
+	$content = $this->posts_lib->pre($content);
         $content = $this->formatting->force_balance_tags($content);
-        $content = $this->request->strip_tags_attributes($content, $this->allowed_tags(), $this->allowed_attributes());
-        
+        //$content = $this->request->strip_tags_attributes($content, $this->allowed_tags(), $this->allowed_attributes());
+	$content = $this->kses->Parse($content);
+        die($content);
         return $content;
     }
     
@@ -144,7 +157,7 @@ class Library_write {
             // For flash embed
             '<embed>',
             '<object>',
-            '<param>'
+            '<param>',
             //end flash embed
 	);
         
