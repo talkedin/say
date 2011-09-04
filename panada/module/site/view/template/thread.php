@@ -135,7 +135,7 @@
         <?php if($reply_preview): ?>
         <div id="reply" class="main_box_wraper" style="margin-top: 30px;">
             <div class="main_box_header">
-                Post Preview
+                <strong>Post Preview</strong>
             </div>
             <div class="clearfix main_box_lists">
                 <div class="thread_usr_info">
@@ -147,7 +147,9 @@
                     <span class="author"><a href="http://talked.in/iskandar">Iskandar Soesman</a></span>
                     <?php echo $reply_preview;?>
                     <div class="mt10">
-                        <input type="submit" value="Post" name="submit" /> <input type="submit" value="Edit" name="edit" />
+                        <form action="#reply" method="post">
+                            <input type="submit" value="Post" name="submit" /> <input type="submit" value="Edit" name="edit" />
+                        </form>
                     </div>
                 </div>
             </div>
@@ -159,7 +161,7 @@
             </div>
             <div class="form_wrap">
                 <form action="#reply" method="post">
-                    <textarea name="content"></textarea>
+                    <textarea name="content"><?php echo $post_content;?></textarea>
                     <br /><br />
                     <input type="hidden" name="f" value="p" />
                     <input type="submit" value="Post" name="submit" /> <input type="submit" value="Preview" name="preview" />

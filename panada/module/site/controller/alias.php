@@ -11,6 +11,7 @@ class Site_controller_alias extends Panada_module {
         
         $this->session          = new Library_session;
         $this->request          = new Library_request;
+        $this->cache            = new Library_cache('memcached');
         $this->library_site     = new Site_library_site;
         $this->model_forums     = new Site_model_forums;
         $this->model_threads    = new Site_model_threads;
@@ -102,11 +103,22 @@ class Site_controller_alias extends Panada_module {
         $views['page_links']    = $this->pagination->get_url();
         
         $views['reply_preview'] = false;
+        $cache_key = 'reply_preview';
+        
         if( $this->request->post('preview') ){
             
-            $views['reply_preview'] = $this->write_lib->sanitize_post_content($this->request->post('content'));
-            $views['reply_preview'] = $this->posts_lib->the_content($views['reply_preview']);
+            $views['reply_preview'] = $this->request->post('content');
+            //Simpan dulu content aslinya ke memcache
+            $this->cache->set_value( $cache_key, $views['reply_preview'], 300 );
             
+            $views['reply_preview'] = $this->write_lib->sanitize_post_content( $views['reply_preview'] );
+            $views['reply_preview'] = $this->posts_lib->the_content( $views['reply_preview'] );
+            
+        }
+        
+        $views['post_content'] = null;
+        if( $this->request->post('edit') ){
+            $views['post_content'] = $this->cache->get_value( $cache_key);
         }
         
         if( $this->request->post('submit') ){
@@ -122,16 +134,22 @@ class Site_controller_alias extends Panada_module {
             $post['forum_id']   = $views['thread']->forum_id;
             $post['site_id']    = $views['thread']->site_id;
             $post['date']       = date('Y-m-d H:i:s');
-            $post['content']    = $this->request->post('content');
+            
+            // Jika data tidak ada dari submit post, maka ambil dari memcache
+            if( ! $post['content'] = $this->request->post('content') )
+                $post['content']  = $this->cache->get_value( $cache_key);
+            
+            $post['content']    = $this->write_lib->sanitize_post_content( $post['content'] );
             
             // Redirect jika berhasil insert
             if( $this->model_replies->add_new($post) ){
                 
                 $this->pagination->total= $this->model_replies->find_total($criteria);
-                $page_links             = $this->pagination->get_url();
-                $end_page               = end($page_links);
                 
-                $this->redirect( $end_page['link'].'?replied#reply' );
+                //hapus preview yg ada di memcache
+                $this->cache->delete_value($cache_key);
+                
+                $this->redirect( $this->pagination->last_url() .'?replied#reply' );
             }
             
         }

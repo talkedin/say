@@ -49,29 +49,8 @@ class Library_posts {
 	$content    = $this->shortcodes->do_shortcode($content);
 	$content    = $this->formatting->wpautop($content);
 	$content    = $this->formatting->wptexturize($content);
-	//$content    = $this->pre($content);
-	//die($content);
 	
 	return $content;
-    }
-    
-    /**
-     * Originally from David Walsh
-     * @link http://davidwalsh.name/php-html-entities
-     */
-    private function pre_entities($matches) {
-	return str_replace($matches[1], htmlentities($matches[1]), $matches[0]);
-    }
-    
-    /**
-     * Originally from David Walsh
-     * @link http://davidwalsh.name/php-html-entities
-     */
-    public function pre($content){
-	
-	//replaces pre content with html entities
-	//to html entities;  assume content is in the "content" variable
-	return preg_replace_callback('/<pre.*?>(.*?)<\/pre>/imsu', array('Library_posts', 'pre_entities'), $content);
     }
 
     public function cut_title($title, $total_char = 0){

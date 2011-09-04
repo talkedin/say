@@ -29,6 +29,25 @@ class Library_write {
     }
     
     /**
+     * Originally from David Walsh
+     * @link http://davidwalsh.name/php-html-entities
+     */
+    private function pre_entities($matches) {
+	return str_replace($matches[1], htmlentities($matches[1]), $matches[0]);
+    }
+    
+    /**
+     * Originally from David Walsh
+     * @link http://davidwalsh.name/php-html-entities
+     */
+    public function pre($content){
+	
+	//replaces pre content with html entities
+	//to html entities;  assume content is in the "content" variable
+	return preg_replace_callback('/<pre.*?>(.*?)<\/pre>/imsu', array('Library_write', 'pre_entities'), $content);
+    }
+    
+    /**
      * Membersihkan post content dari karakter yang tidak diijinkan.
      * Tag dan attribute yang diijinkan dimabil dari method $this->allowed_tags() dan $this->allowed_attributes()
      *
@@ -39,7 +58,6 @@ class Library_write {
     public function sanitize_post_content($content){
         
 	$this->kses = new Library_kses;
-	$this->posts_lib    = new Library_posts;
 	
 	$this->kses->allowed_html = array(
 	    'pre' => array(
@@ -49,11 +67,10 @@ class Library_write {
 		    ),
 	);
 	
-	$content = $this->posts_lib->pre($content);
+	$content = $this->pre($content);
         $content = $this->formatting->force_balance_tags($content);
-        //$content = $this->request->strip_tags_attributes($content, $this->allowed_tags(), $this->allowed_attributes());
-	$content = $this->kses->Parse($content);
-        die($content);
+	$content = $this->kses->Parse($content); //$content = $this->request->strip_tags_attributes($content, $this->allowed_tags(), $this->allowed_attributes());
+        
         return $content;
     }
     
@@ -433,5 +450,14 @@ class Library_write {
             '<p'.$class_attr.'>'
             .preg_replace('#(<br\s*?/?>\s*?){2,}#', '</p>'."\n".'<p'.$class_attr.'>', nl2br($string))
             .'</p>';
-    } 
+    }
+    
+    /**
+     * Masih harus diperbaiki. Pre tag juga ikut distrip
+     */
+    public function p2nl ($str) {
+	return preg_replace(array("/<p[^>]*>/iU","/<\/p[^>]*>/iU"),
+                        array("","\n"),
+                        $str);
+    }
 }

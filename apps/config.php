@@ -75,8 +75,8 @@ $CONFIG['request_filter_type'] = FILTER_SANITIZE_STRING;
 $CONFIG['cache']['default']['driver']   = 'default'; /* The option is 'default', 'apc', 'memcache' or 'memcached' */
 
 // Add this options for memcached/memcache
-//$CONFIG['cache']['memcached']['driver'] = 'memcached';
-//$CONFIG['cache']['memcached']['host'] = array('localhost');
-//$CONFIG['cache']['memcached']['port'] = 11211;
+$CONFIG['cache']['memcached']['driver'] = 'memcached';
+$CONFIG['cache']['memcached']['host'] = array('localhost');
+$CONFIG['cache']['memcached']['port'] = 11211;
 
 $CONFIG['secret_key']                   = '_put_your_random_string_here_';

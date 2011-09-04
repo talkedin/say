@@ -102,7 +102,7 @@
 		 *	@access private
 		 *	@var array
 		 */
-		private $allowed_protocols;
+		public $allowed_protocols;
 		public $allowed_html;
 		/**#@-*/
 
