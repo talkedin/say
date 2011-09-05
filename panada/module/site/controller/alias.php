@@ -166,7 +166,7 @@ class Site_controller_alias extends Panada_module {
         
         
         // Isikan nilai post_content jika ada data dari memcache.
-        $views['post_content']['main_form']['content'] = $this->cache->get_value( $cache_key );
+        $views['post_content']['main_form']['content'] = $this->cache->get_value( $cache_main_key );
         
         
         // Clear data yg ada di memcache
