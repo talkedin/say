@@ -101,7 +101,9 @@
                                     <textarea name="content"></textarea>
                                     <br /><br />
                                     <input type="hidden" name="f" value="c" />
-                                    <input type="submit" value="submit" name="submit" /> <input type="submit" value="Preview" name="preview" />
+                                    <input type="submit" value="submit" name="submit" />
+                                    <input type="submit" value="Preview" name="preview" />
+                                    
                                 </form>
                             </div>
                         </div>
@@ -148,7 +150,8 @@
                     <?php echo $reply_preview;?>
                     <div class="mt10">
                         <form action="#reply" method="post">
-                            <input type="submit" value="Post" name="submit" /> <input type="submit" value="Edit" name="edit" />
+                            <input type="submit" value="Post" name="submit" />
+                            <input type="submit" value="Edit" name="edit" />
                         </form>
                     </div>
                 </div>
@@ -164,7 +167,9 @@
                     <textarea name="content"><?php echo $post_content;?></textarea>
                     <br /><br />
                     <input type="hidden" name="f" value="p" />
-                    <input type="submit" value="Post" name="submit" /> <input type="submit" value="Preview" name="preview" />
+                    <input type="submit" value="Post" name="submit" />
+                    <input type="submit" value="Preview" name="preview" />
+                    <input type="submit" value="Clear" name="clear" />
                 </form>
             </div>
         </div>

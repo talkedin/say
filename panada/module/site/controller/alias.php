@@ -317,7 +317,7 @@ class Site_controller_alias extends Panada_module {
             $this->pagination->current  = $criteria['page'];
         }
         
-        $return->sub_replies = $this->model_replies->find_all($criteria);
+        $return->sub_replies        = $this->model_replies->find_all($criteria);
         $this->pagination->total    = $obj->total_replied;
         
         $this->pagination->no_href  = true;
@@ -325,17 +325,9 @@ class Site_controller_alias extends Panada_module {
         
         if( $return->page_links = $this->pagination->get_url() ){
             
-            $post_reply         = end($return->page_links);
-            $return->post_reply = $curent_url.'/'.$this->url_args[4].'/reply/'.$obj->reply_id.'/'.$post_reply['value'].'/post#form'.$obj->reply_id;
+            $post_reply         = $this->pagination->last_url(true);
+            $return->post_reply = $curent_url.'/'.$this->url_args[4].'/reply/'.$obj->reply_id.'/'.$post_reply['integer_page'].'/post#form'.$obj->reply_id;
             
-            if( $post_reply['value'] != $criteria['page'] ){
-                
-                $post_reply             = $post_reply['link'];
-                $parse_url              = parse_url($post_reply);
-                $parse_url['path']      = $parse_url['path'].'/post';
-                $parse_url['fragment']  = 'form'.$obj->reply_id;
-                $return->post_reply = $parse_url['scheme'].'://'.$parse_url['host'].$parse_url['path'].'#'.$parse_url['fragment'];
-            }
         }
         
         return $return;
