@@ -134,38 +134,57 @@ class Site_controller_alias extends Panada_module {
         
         
         // Flag untuk menentukan mode preview reply.
-        $views['reply_preview'] = false;
+        $views['reply_preview']['main_form']['content'] = false;
         
         
         // Cache key untuk penyimpanan sementara reply yg akan dipreview atau, pada user yg belum login.
-        $cache_key = 'reply_preview_' . session_id();
+        $cache_namespace = 'reply_preview_' . session_id();
+        $cache_main_key = 'main_form';
         
         
         // Submit reply untuk preview.
         if( $this->request->post('preview') ){
             
-            $views['reply_preview'] = $this->request->post('content');
-            
-            // Simpan dulu content aslinya ke memcache selama 300 second
-            $this->cache->set_value( $cache_key, $views['reply_preview'], 300 );
+            $content = $this->request->post('content');
             
             // Bersihkan dari tag2 yg tidak diizinkan.
-            $views['reply_preview'] = $this->write_lib->sanitize_post_content( $views['reply_preview'] );
+            $content = $this->write_lib->sanitize_post_content( $content );
             
             // Rapihkan tag2 (jika ada) dan format menjadi siap ditampilkan ke HTML
-            $views['reply_preview'] = $this->posts_lib->the_content( $views['reply_preview'] );
+            $content = $this->posts_lib->the_content( $content );
+            
+            if( $this->request->post('f') == 'p' ){
+                $views['reply_preview']['main_form']['content'] = $content;
+                $this->cache->set_value( $cache_main_key, $content, 300, $cache_namespace );
+            }
+            else{
+                $views['reply_preview']['sub_form_'.$this->url_args[6]]['content'] = $content;
+                $this->cache->set_value( 'sub_form_'.$this->url_args[6], $content, 300, $cache_namespace );
+            }
             
         }
         
-        $views['post_content'] = null;
         
         // Isikan nilai post_content jika ada data dari memcache.
-        if( $views['post_content'] = $this->cache->get_value( $cache_key ) )
-            $views['post_content'] = $views['post_content'];
+        $views['post_content']['main_form']['content'] = $this->cache->get_value( $cache_key );
         
+        
+        // Clear data yg ada di memcache
+        if( $this->request->post('clear') ){
+            $this->cache->delete_value($cache_namespace);
+            $this->redirect( $views['curent_url'] );
+        }
         
         // Submit reply ke database
         if( $this->request->post('submit') ){
+            
+            
+            $post['parent_id']  = 0;
+            
+            // Cek apakah form submitnya berasal dari main form atau reply form
+            if( $this->request->post('f') == 'c' ){
+                $post['parent_id']  = $this->url_args[6];
+            }
             
             // Belum login? bawa ke halaman login dulu
             if( ! $this->session->get('user_id') ){
@@ -184,7 +203,6 @@ class Site_controller_alias extends Panada_module {
             $post['forum_id']   = $views['thread']->forum_id;
             $post['site_id']    = $views['thread']->site_id;
             $post['date']       = date('Y-m-d H:i:s');
-            
             
             // Jika data tidak ada dari submit post, maka ambil dari memcache
             if( ! $post['content'] = $this->request->post('content') )
@@ -208,9 +226,10 @@ class Site_controller_alias extends Panada_module {
                 $this->cache->delete_value($cache_key);
                 
                 // Struktur ulang url sebelum diredirect.
-                $last_url = $this->reparse_url( $this->pagination->last_url(), array('query' => 'replied', 'fragment' => 'reply') );
+                if( $this->request->post('f') == 'p' )
+                    $views['curent_url'] = $this->reparse_url( $this->pagination->last_url(), array('query' => 'replied', 'fragment' => 'reply') );
                 
-                $this->redirect( $last_url );
+                $this->redirect( $views['curent_url'] );
             }
             
         }
@@ -229,8 +248,6 @@ class Site_controller_alias extends Panada_module {
         }
         
         $this->output('template/thread', $views);
-        
-        
     }
     
     /**

@@ -50,7 +50,7 @@
                         <?php echo $this->posts_lib->the_content($replies->content);?>
                         
                         <div class="mt10">
-                            <a href="<?php echo $replies->post_reply;?>">Reply</a><!-- | <a href="report/">Report</a>-->
+                            <a href="<?php echo $replies->post_reply;?>">Reply</a>
                         </div>
                         
                         <?php if($replies->sub_replies): ?>
@@ -67,7 +67,7 @@
                                     <?php echo $this->posts_lib->the_content($sub_replies->content);?>
                                     
                                     <div class="mt10">
-                                        <a href="<?php echo $replies->post_reply;?>">Reply</a><!-- | <a href="report/">Report</a>-->
+                                        <a href="<?php echo $replies->post_reply;?>">Reply</a>
                                     </div>
                                 </div>
                             </div>
@@ -103,7 +103,7 @@
                                     <input type="hidden" name="f" value="c" />
                                     <input type="submit" value="submit" name="submit" />
                                     <input type="submit" value="Preview" name="preview" />
-                                    
+                                    <input type="submit" value="Clear" name="clear" />
                                 </form>
                             </div>
                         </div>
@@ -134,7 +134,7 @@
         </div>
         
         <?php if($is_editor):?>
-        <?php if($reply_preview): ?>
+        <?php if($reply_preview['main_form']['content']): ?>
         <div id="reply" class="main_box_wraper" style="margin-top: 30px;">
             <div class="main_box_header">
                 <strong>Post Preview</strong>
@@ -147,11 +147,13 @@
                 </div>
                 <div class="thread_content">
                     <span class="author"><a href="http://talked.in/iskandar">Iskandar Soesman</a></span>
-                    <?php echo $reply_preview;?>
+                    <?php echo $reply_preview['main_form']['content'];?>
                     <div class="mt10">
                         <form action="#reply" method="post">
+                            <input type="hidden" name="f" value="p" />
                             <input type="submit" value="Post" name="submit" />
                             <input type="submit" value="Edit" name="edit" />
+                            <input type="submit" value="Clear" name="clear" />
                         </form>
                     </div>
                 </div>
@@ -164,7 +166,7 @@
             </div>
             <div class="form_wrap">
                 <form action="#reply" method="post">
-                    <textarea name="content"><?php echo $post_content;?></textarea>
+                    <textarea name="content"><?php echo $post_content['main_form']['content'];?></textarea>
                     <br /><br />
                     <input type="hidden" name="f" value="p" />
                     <input type="submit" value="Post" name="submit" />
