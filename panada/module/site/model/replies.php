@@ -76,7 +76,8 @@ class Site_model_replies {
        return $this->db->insert( 'replies', $data );
     }
     
-    public function update(){
+    public function update( $data = array(), $where = array() ){
         
+        return $this->db->update('replies', $data, $where);
     }
 }

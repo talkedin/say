@@ -30,14 +30,14 @@
         </div>
         
         <div class="thread_reply">
-            <a href="#reply">Reply</a> | <a href="report/">Report</a>
+            <a href="<?php echo $last_url;?>">Reply</a> | <a href="report/">Report</a>
         </div>
         <a name="replies"></a>
         <?php if($replies): ?>
         <?php foreach($replies as $replies): ?>
             <div class="main_box_wraper" id="p<?php echo $replies->reply_id;?>">
                 <div class="main_box_header">
-                    <?php echo $this->formatting->mysql2date($replies->date, 'd M Y H:i A');?>
+                    <?php echo $this->formatting->mysql2date($replies->date, 'j M Y H:i A');?>
                 </div>
                 <div class="clearfix main_box_lists">
                     <div class="thread_usr_info">
@@ -63,7 +63,7 @@
                                     </a>
                                 </div>
                                 <div class="thread_content_replied">
-                                    <span class="author"><a href="http://talked.in/iskandar">Iskandar Soesman</a> - <?php echo $this->formatting->mysql2date($sub_replies->date, 'd M Y H:i A');?></span>
+                                    <span class="author"><a href="http://talked.in/iskandar">Iskandar Soesman</a> - <?php echo $this->formatting->mysql2date($sub_replies->date, 'j M Y H:i A');?></span>
                                     <?php echo $this->posts_lib->the_content($sub_replies->content);?>
                                     
                                     <div class="mt10">
@@ -116,7 +116,6 @@
         <?php endif; ?>
         
         <div class="paging">
-            
             <?php if($page_links):?>
             <ul>
             <?php foreach($page_links as $paging):?>
@@ -132,6 +131,7 @@
             <?php endif;?>
         </div>
         
+        <?php if($is_editor):?>
         <?php if($reply_preview): ?>
         <div id="reply" class="main_box_wraper" style="margin-top: 30px;">
             <div class="main_box_header">
@@ -168,6 +168,7 @@
                 </form>
             </div>
         </div>
+        <?php endif; ?>
         <?php endif; ?>
     </div>
 

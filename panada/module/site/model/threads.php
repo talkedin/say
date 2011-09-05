@@ -40,4 +40,9 @@ class Site_model_threads {
         
         return $data;
     }
+    
+    public function update( $data = array(), $where = array() ){
+        
+        return $this->db->update('threads', $data, $where);
+    }
 }

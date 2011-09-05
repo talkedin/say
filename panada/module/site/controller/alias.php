@@ -44,13 +44,20 @@ class Site_controller_alias extends Panada_module {
      */
     private function thread(){
         
+        // Load class-class yg dibutuhkan.
         $this->formatting   = new Library_formatting;
         $this->posts_lib    = new Library_posts;
         $this->write_lib    = new Library_write;
         $this->model_replies= new Site_model_replies;
+        $this->pagination   = new Library_pagination;
         
+        
+        // Dapatkan nilai parameter permalink url friendly dan kemudian diolah.
         $name               = urlencode(urldecode(strtolower($this->url_args[3])));
         $date               = $this->formatting->date2mysql($this->url_args[1], $this->url_args[2], $this->url_args[0]);
+        
+        
+        // Setelah nilai permalink didapat, gunakan sebagai kriteria untuk mendapatkan thread.
         $views['thread']    = $this->model_threads->find_one(
                                             array(
                                                 'site_id' => (int) $this->site_info->site_id,
@@ -59,9 +66,12 @@ class Site_controller_alias extends Panada_module {
                                             )
                                         );
         
+        // Jika thread tidak ditemukan, stop proses dan beri 404.
         if( ! $views['thread'] )
             Library_error::_404();
         
+        
+        // Dapatkan data forum yg menjadi parent dari thread ini.
         $forum = $this->model_forums->find_one(
                                             array(
                                                 'site_id' => (int) $this->site_info->site_id,
@@ -69,21 +79,27 @@ class Site_controller_alias extends Panada_module {
                                             )
                                         );
         
+        // Jika forum tidak ada, stop proses dan beri 404
+        // OPTIMASI: Pada DB SQL bisa dilakukan query thread dan forum sekaligus.
         if( ! $forum )
             Library_error::_404();
         
         $views['site']      = $this->site_info;
         $views['curent_url']= $curent_url = $this->library_site->thread_url( $views['thread'] );
         
+        
+        // Paging default, page 1
         $page = 1;
         
+        
+        // Jika ada parameter tambahan pada url, maka tambahkan kedalam var curent url.
         if( isset($this->url_args[4]) && $this->url_args[4] > 0 ){
             $views['curent_url'] .= '/'.$this->url_args[4];
             $page = $this->url_args[4];
         }
         
-        $this->pagination       = new Library_pagination;
         
+        // Buat kriteria untuk mendapatkan data reply thread.
         $criteria = array(
                     'site_id'   => $this->site_info->site_id,
                     'thread_id' => $views['thread']->thread_id,
@@ -92,40 +108,74 @@ class Site_controller_alias extends Panada_module {
                     'limit'     => 5,
                 );
         
-        $views['replies']           = $this->build_replies($criteria, $curent_url);//$this->model_replies->find_all($criteria);
+        
+        // Passing informasi yg dibutuhkan ke method build_replies() untuk menyusun ulang urutan reply dan subreply.
+        //$this->model_replies->find_all($criteria);
+        $views['replies']           = $this->build_replies($criteria, $curent_url);
+        
+        
+        // Tentukan paramter2 yg dibutuhkan untuk paging.
         $this->pagination->limit    = $criteria['limit'];
         $this->pagination->base     = $curent_url.'/%#%#replies';
 	$this->pagination->total    = $views['thread']->total_replied_parent;//$this->model_replies->find_total($criteria);
 	$this->pagination->current  = $page;
         $this->pagination->no_href  = true;
         $this->pagination->prev_next= false;
+        $views['page_links']        = $this->pagination->get_url();
         
-        $views['page_links']    = $this->pagination->get_url();
+        $last_url                   = $this->pagination->last_url(true);
+        $views['last_url']          = $this->reparse_url($last_url['str_url'], array('fragment' => 'reply') );
         
+        
+        // Tampilkan form submit hanya di paging terakhir.
+        $views['is_editor'] = false;
+        if($page == $last_url['integer_page'])
+            $views['is_editor'] = true;
+        
+        
+        // Flag untuk menentukan mode preview reply.
         $views['reply_preview'] = false;
-        $cache_key = 'reply_preview';
         
+        
+        // Cache key untuk penyimpanan sementara reply yg akan dipreview atau, pada user yg belum login.
+        $cache_key = 'reply_preview_' . session_id();
+        
+        
+        // Submit reply untuk preview.
         if( $this->request->post('preview') ){
             
             $views['reply_preview'] = $this->request->post('content');
-            //Simpan dulu content aslinya ke memcache
+            
+            // Simpan dulu content aslinya ke memcache selama 300 second
             $this->cache->set_value( $cache_key, $views['reply_preview'], 300 );
             
+            // Bersihkan dari tag2 yg tidak diizinkan.
             $views['reply_preview'] = $this->write_lib->sanitize_post_content( $views['reply_preview'] );
+            
+            // Rapihkan tag2 (jika ada) dan format menjadi siap ditampilkan ke HTML
             $views['reply_preview'] = $this->posts_lib->the_content( $views['reply_preview'] );
             
         }
         
         $views['post_content'] = null;
-        if( $this->request->post('edit') ){
-            $views['post_content'] = $this->cache->get_value( $cache_key);
-        }
         
+        // Isikan nilai post_content jika ada data dari memcache.
+        if( $views['post_content'] = $this->cache->get_value( $cache_key ) )
+            $views['post_content'] = $views['post_content'];
+        
+        
+        // Submit reply ke database
         if( $this->request->post('submit') ){
             
             // Belum login? bawa ke halaman login dulu
-            if( ! $this->session->get('user_id') )
+            if( ! $this->session->get('user_id') ){
+                
+                // Simpan dulu content aslinya ke memcache selama 300 second
+                if( $post['content'] = $this->request->post('content') )
+                    $this->cache->set_value( $cache_key, $post['content'], 300 );
+                
                 $this->redirect( 'signin?next=' . urlencode($views['curent_url']) );
+            }
             
             
             // Siapkan data yg akan disimpan ke database
@@ -135,27 +185,40 @@ class Site_controller_alias extends Panada_module {
             $post['site_id']    = $views['thread']->site_id;
             $post['date']       = date('Y-m-d H:i:s');
             
+            
             // Jika data tidak ada dari submit post, maka ambil dari memcache
             if( ! $post['content'] = $this->request->post('content') )
                 $post['content']  = $this->cache->get_value( $cache_key);
             
+            
+            // Bersihkan dari tag2 yg tidak diizinkan.
             $post['content']    = $this->write_lib->sanitize_post_content( $post['content'] );
             
-            // Redirect jika berhasil insert
+            
+            // Redirect jika berhasil insert.
+            // NOTICE: Yang belum adalah halaman/notifikasi jika gagal insert.
             if( $this->model_replies->add_new($post) ){
                 
-                $this->pagination->total= $this->model_replies->find_total($criteria);
+                $this->pagination->total = $this->model_replies->find_total($criteria);
                 
-                //hapus preview yg ada di memcache
+                // Update jumlah total reply
+                $this->model_threads->update( array('total_replied_parent' => $this->pagination->total), array('thread_id' => $post['thread_id']) );
+                
+                // hapus preview yg ada di memcache
                 $this->cache->delete_value($cache_key);
                 
-                $this->redirect( $this->pagination->last_url() .'?replied#reply' );
+                // Struktur ulang url sebelum diredirect.
+                $last_url = $this->reparse_url( $this->pagination->last_url(), array('query' => 'replied', 'fragment' => 'reply') );
+                
+                $this->redirect( $last_url );
             }
             
         }
         
+        
+        // Siapkan data2 yg akan ditampilkan ke dalam view.
         $views['thread_title']  = $this->posts_lib->filters_the_title($views['thread']->title);
-        $views['thread_date']   = $this->formatting->mysql2date($views['thread']->create_date, 'd M Y H:i A');
+        $views['thread_date']   = $this->formatting->mysql2date($views['thread']->create_date, 'j M Y H:i A');
         $views['thread_desc']   = $this->formatting->teaser(30, $views['thread']->content);
         $views['thread_content']= $this->posts_lib->the_content($views['thread']->content);
         $views['bredcump']      = $this->model_forums->bredcump($this->site_info->site_id, $forum->forum_id);
@@ -167,14 +230,45 @@ class Site_controller_alias extends Panada_module {
         
         $this->output('template/thread', $views);
         
+        
     }
     
+    /**
+     * Struktur ulang url.
+     *
+     * @param string
+     * @param array
+     * @return string | array
+     */
+    private function reparse_url( $url_str, $component = array() ){
+        
+        $url_str = parse_url($url_str);
+        $url_str = array_merge($url_str, $component);
+        
+        $url = $url_str['scheme'] .'://' . $url_str['host'];
+        
+        if( isset($url_str['path']) )
+            $url .= $url_str['path'];
+        
+        if( isset($url_str['query']) )
+            $url .= '?'.$url_str['query'];
+        
+        if( isset($url_str['fragment']) )
+            $url .= '#'.$url_str['fragment'];
+        
+        return $url;
+        
+    }
+    
+    /**
+     * Menyusun ulang struktur reply dan subreply.
+     */
     private function build_replies($criteria, $curent_url){
         
         if( ! isset($this->url_args[4]) )
             $this->url_args[4] = 1;
         
-        //print_r($this->url_args);exit;
+        
         if( ! $replies = $this->model_replies->find_all($criteria) )
             return false;
         
@@ -197,7 +291,7 @@ class Site_controller_alias extends Panada_module {
     }
     
     /**
-     * bagian ini sepertinya  bisa dicache
+     * OPTIMASI: bagian ini sepertinya  bisa dicache
      */
     private function build_sub_replies($obj, $criteria, $curent_url){
         

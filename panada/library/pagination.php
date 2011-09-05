@@ -181,13 +181,19 @@ class Library_pagination {
         return $paging_url;
     }
     
-    public function last_url(){
+    public function last_url($array_component = false){
         
         $total = ceil($this->total / $this->limit);
+        
         if ( $total < 2 )
             $total = 1;
         
-        return str_replace('%#%', $total, $this->base);
+        $str_url = str_replace('%#%', $total, $this->base);
+        
+        if( $array_component )
+            return array('integer_page' => $total, 'str_url' => $str_url);
+        
+        return $str_url;
     }
     
 } // End Pagination Class.
