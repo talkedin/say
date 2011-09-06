@@ -192,7 +192,8 @@ class Site_controller_alias extends Panada_module {
             // Cek apakah form submitnya berasal dari main form atau reply form
             if( $this->request->post('f') == 'c' ){
                 $post['parent_id']  = $this->url_args[6];
-                $cache_main_key = 'sub_form_'.$this->url_args[6];
+                $cache_main_key     = 'sub_form_'.$this->url_args[6];
+                $views['curent_url']= $this->library_site->curent_location().'#form'.$post['parent_id'];
             }
             
             // Belum login? bawa ke halaman login dulu
