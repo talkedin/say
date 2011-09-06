@@ -15,7 +15,7 @@
             </div>
             <div class="float_r">
                 <?php if($this->session->get('user_id') > 0 ): ?>
-                <strong><?php echo $this->session->get('username');?></strong> - <a href="<?php echo $this->location('signout?next='.$this->library_site->curent_location());?>">Sign Out</a>
+                <strong><?php echo $this->session->get('username');?></strong> - <a href="<?php echo $this->location('signout?next='.$this->library_site->location());?>">Sign Out</a>
                 <?php else:?>
                 <a href="<?php echo $this->location('signin?next='.$this->library_site->curent_location());?>">Sign In</a>
                 <?php endif;?>

@@ -16,6 +16,7 @@ class Site_controller_alias extends Panada_module {
         $this->model_forums     = new Site_model_forums;
         $this->model_threads    = new Site_model_threads;
         $this->model_site_info  = new Site_model_site_info;
+        $this->users            = new Model_users;
     }
     
     public function index(){
@@ -112,7 +113,7 @@ class Site_controller_alias extends Panada_module {
         // Passing informasi yg dibutuhkan ke method build_replies() untuk menyusun ulang urutan reply dan subreply.
         //$this->model_replies->find_all($criteria);
         $views['replies']           = $this->build_replies($criteria, $curent_url);
-        
+        //print_r($views['replies']);exit;
         
         // Tentukan paramter2 yg dibutuhkan untuk paging.
         $this->pagination->limit    = $criteria['limit'];
@@ -320,6 +321,17 @@ class Site_controller_alias extends Panada_module {
             
             $replies[$key]->sub_replies = false;
             $replies[$key]->page_links  = false;
+            
+            $replies[$key]->author          = $this->users->find_one( array('user_id' => $obj->author_id) );
+            $replies[$key]->author->avatar  = $this->users->find_gravatar( $replies[$key]->author->email );
+            
+            // hilangkan object2 yg tidak perlu.
+            unset(
+                $replies[$key]->author->user_id,
+                $replies[$key]->author->password,
+                $replies[$key]->author->salt
+            );
+            
             $replies[$key]->post_reply  = $curent_url.'/'.$this->url_args[4].'/reply/'.$obj->reply_id.'/1/post#form'.$obj->reply_id;
             
             if($obj->total_replied > 0){
@@ -351,7 +363,9 @@ class Site_controller_alias extends Panada_module {
         }
         
         $criteria['parent_id']      = $obj->reply_id;
-        $criteria['limit']          = 1;
+        
+        // Berapa jumlah post yg akan ditampilkan dalam satu subreply
+        $criteria['limit']          = 3;
         $criteria['page']           = 1;
         $this->pagination->limit    = $criteria['limit'];
         $this->pagination->base     = $curent_url.'/'.$this->url_args[4].'/reply/'.$obj->reply_id.'/%#%#p'.$obj->reply_id;
@@ -364,6 +378,20 @@ class Site_controller_alias extends Panada_module {
         }
         
         $return->sub_replies        = $this->model_replies->find_all($criteria);
+        
+        // Ambil data penulis reply ini.
+        foreach($return->sub_replies as $key => $val){
+            $return->sub_replies[$key]->author          = $this->users->find_one( array('user_id' => $val->author_id) );
+            $return->sub_replies[$key]->author->avatar  = $this->users->find_gravatar( $return->sub_replies[$key]->author->email );
+            
+            // hilangkan object2 yg tidak perlu.
+            unset(
+                $return->sub_replies[$key]->author->user_id,
+                $return->sub_replies[$key]->author->password,
+                $return->sub_replies[$key]->author->salt
+            );
+        }
+        
         $this->pagination->total    = $obj->total_replied;
         
         $this->pagination->no_href  = true;

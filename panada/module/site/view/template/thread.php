@@ -42,11 +42,11 @@
                 <div class="clearfix main_box_lists">
                     <div class="thread_usr_info">
                         <a href="http://talked.in/iskandar">
-                            <img src="http://www.gravatar.com/avatar/b43a722e4a4f91ef193fbe18bb659f5d.jpg?s=48&d=mm" alt="Kandar" />
+                            <img src="<?php echo $replies->author->avatar;?>" alt="<?php echo $replies->author->username;?>" />
                         </a>
                     </div>
                     <div class="thread_content">
-                        <span class="author"><a href="http://talked.in/iskandar">Iskandar Soesman</a></span>
+                        <span class="author"><a href="http://talked.in/<?php echo $replies->author->username;?>"><?php echo $replies->author->username;?></a></span>
                         <?php echo $this->posts_lib->the_content($replies->content);?>
                         
                         <div class="mt10">
@@ -59,11 +59,11 @@
                             <div class="clearfix thread_replied_list">
                                 <div class="thread_usr_info">
                                     <a href="http://talked.in/iskandar">
-                                        <img src="http://www.gravatar.com/avatar/b43a722e4a4f91ef193fbe18bb659f5d.jpg?s=48&d=mm" alt="Kandar" />
+                                        <img src="<?php echo $sub_replies->author->avatar;?>" alt="<?php echo $sub_replies->author->username;?>" />
                                     </a>
                                 </div>
                                 <div class="thread_content_replied">
-                                    <span class="author"><a href="http://talked.in/iskandar">Iskandar Soesman</a> - <?php echo $this->formatting->mysql2date($sub_replies->date, 'j M Y H:i A');?></span>
+                                    <span class="author"><a href="http://talked.in/<?php echo $sub_replies->author->username;?>"><?php echo $sub_replies->author->username;?></a> - <?php echo $this->formatting->mysql2date($sub_replies->date, 'j M Y H:i A');?></span>
                                     <?php echo $this->posts_lib->the_content($sub_replies->content);?>
                                     
                                     <div class="mt10">

@@ -6,7 +6,7 @@ class Controller_signin extends Panada {
         
         parent::__construct();
         
-        $this->db           = new Library_db;
+        $this->users        = new Model_users;
         $this->request      = new Library_request;
         $this->validation   = new Library_validation;
         $this->session      = new Library_session;
@@ -23,14 +23,14 @@ class Controller_signin extends Panada {
             
             if( $password && $username ){
                 
-                $this->db->select()->from('users');
+                $args = array();
                 
                 if( $email = $this->validation->is_email($username) )
-                    $this->db->where('email', '=', $email);
+                    $args['email'] = $email;
                 else
-                    $this->db->where('username', '=', $username);
+                    $args['username'] = $username;
                 
-                $user = $this->db->find_one();
+                $user = $this->users->find_one($args);
                 
                 $hashed_password = md5( md5($password) . $user->salt );
                 
