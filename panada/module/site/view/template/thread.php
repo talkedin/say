@@ -72,42 +72,64 @@
                                 </div>
                             </div>
                             <?php endforeach; ?>
-                            <?php if($replies->page_links):?>
-                            <div class="paging" style="border-top:1px solid #E5E5E5;">
-                                <ul>
-                                <?php foreach($replies->page_links as $paging):?>
-                                    <li>
-                                        <?php if( empty($paging['link']) ): ?>
-                                        <a class="selected"><?php echo $paging['value'];?></a>
-                                        <?php else: ?>
-                                        <a href="<?php echo $paging['link'];?>"><?php echo $paging['value'];?></a>
-                                        <?php endif; ?>
-                                    </li>
-                                <?php endforeach;?>
-                                </ul>
-                            </div>
-                            <?php endif;?>
-                            
                         </div>
                         <?php endif; ?>
                         
                         <?php if($post_form == $replies->reply_id): ?>
-                        <div class="main_box_wraper form_box" id="form<?php echo $replies->reply_id; ?>">
-                            <div style="padding:5px;">
-                                <strong>Reply this post</strong>
+                            <?php if( isset($reply_preview[$replies->reply_id]['content']) ): ?>
+                            <div class="clearfix thread_replied_list" id="form<?php echo $replies->reply_id; ?>">
+                                <div class="thread_usr_info">
+                                    <a href="http://talked.in/iskandar">
+                                        <img alt="Kandar" src="http://www.gravatar.com/avatar/b43a722e4a4f91ef193fbe18bb659f5d.jpg?s=48&amp;d=mm">
+                                    </a>
+                                </div>
+                                <div class="thread_content_replied">
+                                    <span class="author"><a href="http://talked.in/iskandar">Iskandar Soesman</a></span>
+                                    <?php echo $reply_preview[$replies->reply_id]['content'];?>
+                                    <div class="mt10">
+                                        <form action="#form<?php echo $replies->reply_id; ?>" method="post">
+                                            <input type="hidden" name="f" value="c" />
+                                            <input type="submit" value="Post" name="submit" />
+                                            <input type="submit" value="Edit" name="edit" />
+                                            <input type="submit" value="Clear" name="clear" />
+                                        </form>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="form_wrap">
-                                <form action="" method="post">
-                                    <textarea name="content"></textarea>
-                                    <br /><br />
-                                    <input type="hidden" name="f" value="c" />
-                                    <input type="submit" value="submit" name="submit" />
-                                    <input type="submit" value="Preview" name="preview" />
-                                    <input type="submit" value="Clear" name="clear" />
-                                </form>
+                            <?php else: ?>
+                            <div class="main_box_wraper form_box" id="form<?php echo $replies->reply_id; ?>">
+                                <div style="padding:5px;">
+                                    <strong>Reply this post</strong>
+                                </div>
+                                <div class="form_wrap">
+                                    <form action="#form<?php echo $replies->reply_id; ?>" method="post">
+                                        <textarea name="content"><?php echo $sub_content[$replies->reply_id];?></textarea>
+                                        <br /><br />
+                                        <input type="hidden" name="f" value="c" />
+                                        <input type="submit" value="submit" name="submit" />
+                                        <input type="submit" value="Preview" name="preview" />
+                                        <input type="submit" value="Clear" name="clear" />
+                                    </form>
+                                </div>
                             </div>
-                        </div>
+                            <?php endif; ?>
                         <?php endif; ?>
+                        
+                        <?php if($replies->page_links):?>
+                        <div class="paging" style="border-top:1px solid #E5E5E5;">
+                            <ul>
+                            <?php foreach($replies->page_links as $paging):?>
+                                <li>
+                                    <?php if( empty($paging['link']) ): ?>
+                                    <a class="selected"><?php echo $paging['value'];?></a>
+                                    <?php else: ?>
+                                    <a href="<?php echo $paging['link'];?>"><?php echo $paging['value'];?></a>
+                                    <?php endif; ?>
+                                </li>
+                            <?php endforeach;?>
+                            </ul>
+                        </div>
+                        <?php endif;?>
                     </div>
                 </div>
                 
