@@ -56,7 +56,10 @@ class Model_users {
         return true;
     }
     
-    public function find_gravatar($email, $s = 48, $is_https = false){
+    public function find_gravatar($email = null, $s = 48, $is_https = false){
+        
+        if( is_null($email) )
+            return 'http://www.gravatar.com/avatar/00000000000000000000000000000000?d=mm&s='.$s;
         
         $hash = md5(strtolower($email));
         $http = 'http';

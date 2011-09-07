@@ -40,6 +40,7 @@ class Controller_signin extends Panada {
                         array(
                             'username' => $user->username,
                             'user_id' => $user->user_id,
+                            'avatar' => $this->users->find_gravatar($user->email),
                         )
                     );
                     

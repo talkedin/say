@@ -4,6 +4,7 @@ class Site_controller_alias extends Panada_module {
     
     private $site_info;
     private $url_args = array();
+    public $signed_in;
     
     public function __construct(){
         
@@ -17,6 +18,18 @@ class Site_controller_alias extends Panada_module {
         $this->model_threads    = new Site_model_threads;
         $this->model_site_info  = new Site_model_site_info;
         $this->users            = new Model_users;
+        
+        
+        // Inisial properties untuk user yang sudah sign in.
+        $this->signed_in->username = 'Anonymous';
+        $this->signed_in->avatar = $this->users->find_gravatar();
+        
+        
+        // Reinisial object di atas jika user sudah sign in.
+        if( $this->session->get('user_id') ){
+            $this->signed_in->username = $this->session->get('username');
+            $this->signed_in->avatar = $this->session->get('avatar');
+        }
     }
     
     public function index(){
@@ -72,6 +85,21 @@ class Site_controller_alias extends Panada_module {
             Library_error::_404();
         
         
+        // Tambahkan object properties untuk thread author (TS).
+        // OPTIMASI: Pada DB SQL bisa dilakukan query tabel thread dan user sekaligus.
+        $views['thread']->author = $this->users->find_one( array('user_id' => $views['thread']->author_id) );
+        $views['thread']->author->avatar = $this->users->find_gravatar( $views['thread']->author->email );
+        
+       
+        // Hapus object yg tidak diperlukan untuk menghemat memory.
+        unset(
+            $views['thread']->author->user_id,
+            $views['thread']->author->password,
+            $views['thread']->author->salt,
+            $views['thread']->author->email
+        );
+        
+        
         // Dapatkan data forum yg menjadi parent dari thread ini.
         $forum = $this->model_forums->find_one(
                                             array(
@@ -81,7 +109,7 @@ class Site_controller_alias extends Panada_module {
                                         );
         
         // Jika forum tidak ada, stop proses dan beri 404
-        // OPTIMASI: Pada DB SQL bisa dilakukan query thread dan forum sekaligus.
+        // OPTIMASI: Pada DB SQL bisa dilakukan query tabel thread, user dan forum sekaligus.
         if( ! $forum )
             Library_error::_404();
         

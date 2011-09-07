@@ -14,9 +14,21 @@ class Site_controller_forum extends Panada_module {
         $this->model_forums     = new Site_model_forums;
         $this->model_threads    = new Site_model_threads;
         $this->model_site_info  = new Site_model_site_info;
+        $this->users            = new Model_users;
         
         if( ! $this->site_info = $this->model_site_info->data() )
             Library_error::_404();
+        
+        // Inisial properties untuk user yang sudah sign in.
+        $this->signed_in->username = 'Anonymous';
+        $this->signed_in->avatar = $this->users->find_gravatar();
+        
+        
+        // Reinisial object di atas jika user sudah sign in.
+        if( $this->session->get('user_id') ){
+            $this->signed_in->username = $this->session->get('username');
+            $this->signed_in->avatar = $this->session->get('avatar');
+        }
     }
     
     public function index(){

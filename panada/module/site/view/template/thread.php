@@ -14,13 +14,13 @@
             </div>
             <div class="clearfix main_box_lists">
                 <div class="thread_usr_info">
-                    <a href="http://talked.in/iskandar">
-                        <img src="http://www.gravatar.com/avatar/b43a722e4a4f91ef193fbe18bb659f5d.jpg?s=48&d=mm" alt="Kandar" />
+                    <a href="http://talked.in/<?php echo $thread->author->username;?>">
+                        <img src="<?php echo $thread->author->avatar;?>" alt="<?php echo $thread->author->username;?>" />
                     </a>
                 </div>
                 <div class="thread_content">
                     <h2 style="margin:0;"><?php echo $thread_title;?></h2>
-                    <span class="author"><a href="http://talked.in/iskandar">Iskandar Soesman</a> - <?php echo $thread_date;?></span>
+                    <span class="author"><a href="http://talked.in/<?php echo $thread->author->username;?>"><?php echo $thread->author->username;?></a> - <?php echo $thread_date;?></span>
                    
                     <?php echo $thread_content;?>
                     
@@ -41,7 +41,7 @@
                 </div>
                 <div class="clearfix main_box_lists">
                     <div class="thread_usr_info">
-                        <a href="http://talked.in/iskandar">
+                        <a href="http://talked.in/<?php echo $replies->author->username;?>">
                             <img src="<?php echo $replies->author->avatar;?>" alt="<?php echo $replies->author->username;?>" />
                         </a>
                     </div>
@@ -58,7 +58,7 @@
                             <?php foreach($replies->sub_replies as $sub_replies): ?>
                             <div class="clearfix thread_replied_list">
                                 <div class="thread_usr_info">
-                                    <a href="http://talked.in/iskandar">
+                                    <a href="http://talked.in/<?php echo $sub_replies->author->username;?>">
                                         <img src="<?php echo $sub_replies->author->avatar;?>" alt="<?php echo $sub_replies->author->username;?>" />
                                     </a>
                                 </div>
@@ -79,12 +79,12 @@
                             <?php if( isset($reply_preview[$replies->reply_id]['content']) ): ?>
                             <div class="clearfix thread_replied_list" id="form<?php echo $replies->reply_id; ?>">
                                 <div class="thread_usr_info">
-                                    <a href="http://talked.in/iskandar">
-                                        <img alt="Kandar" src="http://www.gravatar.com/avatar/b43a722e4a4f91ef193fbe18bb659f5d.jpg?s=48&amp;d=mm">
+                                    <a href="http://talked.in/<?php echo $this->signed_in->username;?>">
+                                        <img alt="<?php echo $this->signed_in->username;?>" src="<?php echo $this->signed_in->avatar;?>">
                                     </a>
                                 </div>
                                 <div class="thread_content_replied">
-                                    <span class="author"><a href="http://talked.in/iskandar">Iskandar Soesman</a></span>
+                                    <span class="author"><a href="http://talked.in/<?php echo $this->signed_in->username;?>"><?php echo $this->signed_in->username;?></a></span>
                                     <?php echo $reply_preview[$replies->reply_id]['content'];?>
                                     <div class="mt10">
                                         <form action="#form<?php echo $replies->reply_id; ?>" method="post">
@@ -163,12 +163,12 @@
             </div>
             <div class="clearfix main_box_lists">
                 <div class="thread_usr_info">
-                    <a href="http://talked.in/iskandar">
-                        <img alt="Kandar" src="http://www.gravatar.com/avatar/b43a722e4a4f91ef193fbe18bb659f5d.jpg?s=48&amp;d=mm">
+                    <a href="http://talked.in/<?php echo $this->signed_in->username;?>">
+                        <img alt="<?php echo $this->signed_in->username;?>" src="<?php echo $this->signed_in->avatar;?>">
                     </a>
                 </div>
                 <div class="thread_content">
-                    <span class="author"><a href="http://talked.in/iskandar">Iskandar Soesman</a></span>
+                    <span class="author"><a href="http://talked.in/<?php echo $this->signed_in->username;?>"><?php echo $this->signed_in->username;?></a></span>
                     <?php echo $reply_preview['main_form']['content'];?>
                     <div class="mt10">
                         <form action="#reply" method="post">
