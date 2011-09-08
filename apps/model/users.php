@@ -69,4 +69,9 @@ class Model_users {
         
         return $http.'://www.gravatar.com/avatar/'.$hash.'?s='.$s;
     }
+    
+    public function add_new( $data = array() ){
+        
+       return $this->db->insert( 'users', $data );
+    }
 }
