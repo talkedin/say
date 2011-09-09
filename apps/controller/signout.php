@@ -21,9 +21,15 @@ class Controller_signout extends Panada {
         $max_key    = count($arr) - 1;
         
         if( $arr[$max_key -1].'.'.$arr[$max_key] == 'talked.in' )
-            $this->redirect($location);
+            $this->html_redirect($location);
         
         $location = 'http://'.$host.'/cda/signout?next='.urlencode($location);
-        $this->redirect($location);
+        $this->html_redirect($location);
+    }
+    
+    private function html_redirect($location){
+        
+        $this->output('signin', array('location' => $location) );
+        exit;
     }
 }

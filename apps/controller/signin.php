@@ -50,10 +50,10 @@ class Controller_signin extends Panada {
                     $max_key    = count($arr) - 1;
                     
                     if( $arr[$max_key -1].'.'.$arr[$max_key] == 'talked.in' )
-                        $this->redirect($location);
+                        $this->html_redirect($location);
                     
                     $location = 'http://'.$host.'/cda?next='.urlencode($location).'&ak='.$user->user_id;
-                    $this->redirect($location);
+                    $this->html_redirect($location);
                 }
                 else{
                     $views['is_error'] = 'Wrong Username/Email and password combination.';
@@ -62,5 +62,11 @@ class Controller_signin extends Panada {
         }
         
         $this->output('accounts/signin', $views);
+    }
+    
+    private function html_redirect($location){
+        
+        $this->output('signin', array('location' => $location) );
+        exit;
     }
 }
