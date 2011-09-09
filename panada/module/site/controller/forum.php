@@ -113,6 +113,9 @@ class Site_controller_forum extends Panada_module {
      */
     private function thread_create(){
         
+        // Form security. Mencegah cross posting.
+        $this->session->set('token_key',  strtotime('+30 minutes') );
+        
         $this->posts_lib    = new Library_posts;
         $this->write_lib    = new Library_write;
         
@@ -171,6 +174,12 @@ class Site_controller_forum extends Panada_module {
         
         // Procession submit
         if( $this->request->post('submit') ){
+            
+            // Pastikan submit tidak berasal dari aplikasi lain (cross posting).
+            if( $this->session->get('token_key') < time() ){
+                Library_error::costume(401, 'Unauthorized');
+                exit;
+            }
             
             
             // Apakah user sudah signin? Jika belum simpan data yg ia submit ke cache.
