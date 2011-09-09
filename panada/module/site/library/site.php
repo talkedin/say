@@ -22,8 +22,10 @@ class Site_library_site {
         $validation = new Library_validation;
         $site_name  = $this->site_name();
         
-        if( $validation->is_url($site_name) )
-            $url = 'http://'.$site_name.'/';
+        $url = 'http://'.$site_name.'/';
+        
+        if( $validation->is_url($url) )
+            $url = $url;
         else
             $url = 'http://'.$site_name.'.talked.in/';
         

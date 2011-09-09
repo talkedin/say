@@ -44,7 +44,15 @@ class Controller_signin extends Panada {
                         )
                     );
                     
-                    $location = ( $this->request->get('next') ) ? urldecode($this->request->get('next')) : '';
+                    $location   = ( $this->request->get('next') ) ? urldecode($this->request->get('next')) : 'http://talked.in/';
+                    $host       = parse_url($location, PHP_URL_HOST);
+                    $arr        = explode('.', $host);
+                    $max_key    = count($arr) - 1;
+                    
+                    if( $arr[$max_key -1].'.'.$arr[$max_key] == 'talked.in' )
+                        $this->redirect($location);
+                    
+                    $location = 'http://'.$host.'/cda?next='.urlencode($location).'&ak='.$user->user_id;
                     $this->redirect($location);
                 }
                 else{
