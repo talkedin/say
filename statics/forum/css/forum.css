@@ -114,7 +114,6 @@ img {
 
 .form_box {
     border:1px solid #CCCCCC;
-    margin-top:30px;
     background: none repeat scroll 0 0 #F5F5F5;
 }
 
@@ -122,6 +121,16 @@ img {
     width:99.7%;
     height:100px;
     border:1px solid #CCCCCC;
+}
+
+.form_box input[type="text"] {
+    border:1px solid #CCCCCC;
+    font-size: 1.2em;
+    line-height: 100%;
+    outline: medium none;
+    width: 100%;
+    margin-bottom:10px;
+    display:block;
 }
 
 .form_box .form_wrap {
@@ -173,4 +182,25 @@ pre {
     font-size:12px;
     margin:14px 0;
     padding:12px 10px;
+}
+
+.notice {
+    margin-top:10px;
+    padding:5px;
+    background-color:#FFFFDD;
+    border:1px solid #FFD700;
+    display:block;
+}
+
+.error {
+    margin-top:10px;
+    padding:5px;
+    background-color:#FFEFEF;
+    border:1px solid #CC0000;
+    display:block;
+}
+
+.error ul {
+    margin:0;
+    padding-left:1.2em;
 }

@@ -15,6 +15,7 @@ class Site_controller_home extends Panada_module {
         $this->model_forums     = new Site_model_forums;
         $this->model_site_info  = new Site_model_site_info;
         $this->users            = new Model_users;
+        $this->formatting       = new Library_formatting;
         
         // Inisial properties untuk user yang sudah sign in.
         $this->signed_in->username = 'Anonymous';

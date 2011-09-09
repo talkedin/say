@@ -23,7 +23,7 @@
                         <?php else: ?>
                             <div class="main_box_lists">
                                 <p>
-                                <?php echo $forum->description;?>
+                                <?php echo $this->formatting->teaser(50, $forum->description);?>
                                 </p>
                                 <span>33,735 topics and 168,174 posts</span>
                             </div>
