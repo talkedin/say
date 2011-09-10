@@ -6,15 +6,16 @@ class Controller_signout extends Panada {
         
         parent::__construct();
         
-        $this->session = new Library_session;
-        $this->request = new Library_request;
+        $this->session  = new Library_session;
+        $this->request  = new Library_request;
+        $this->site_info= new Model_site_info;
     }
     
     public function index(){
         
         $this->session->session_clear_all();
         
-        $location = ( $this->request->get('next') ) ? urldecode($this->request->get('next')) : '';
+        $location = ( $this->request->get('next') ) ? urldecode($this->request->get('next')) : 'http://talked.in/';
         
         $host       = parse_url($location, PHP_URL_HOST);
         $arr        = explode('.', $host);
@@ -29,7 +30,15 @@ class Controller_signout extends Panada {
     
     private function html_redirect($location){
         
-        $this->output('signin', array('location' => $location) );
+        $signout_other = false;
+        
+        if( isset($_COOKIE['DSC'] ) ){
+            $sites = explode(',', $_COOKIE['DSC']);
+            $signout_other = $this->site_info->find_in($sites);
+            setcookie('DSC', null, time() - 3600, '/', 'talked.in');
+        }
+        
+        $this->output('redirect', array('location' => $location, 'signout_other' => $signout_other, 'is_top' => false) );
         exit;
     }
 }

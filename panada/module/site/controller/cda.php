@@ -10,13 +10,14 @@ class Site_controller_cda extends Panada_module {
         $this->request      = new Library_request;
         $this->validation   = new Library_validation;
         $this->session      = new Library_session;
+        $this->cache        = new Library_cache('memcached');
     }
     
     public function index(){
         
         $auth_key = $this->request->get('ak');
         
-        if( $user = $this->users->find_one( array('user_id' => $auth_key) ) ){
+        if( $user = $this->cache->get_value($auth_key) ){
             
             $this->session->set(
                 array(
@@ -27,6 +28,8 @@ class Site_controller_cda extends Panada_module {
             );
             
             $location = ( $this->request->get('next') ) ? urldecode($this->request->get('next')) : 'http://talked.in/';
+            
+            $this->cache->delete_value($auth_key);
             
             $this->redirect($location);
         }
@@ -39,5 +42,12 @@ class Site_controller_cda extends Panada_module {
         $this->session->session_clear_all();
         
         $this->redirect($location);
+    }
+    
+    /**
+     * Local Sign Out
+     */
+    public function lso(){
+        $this->session->session_clear_all();
     }
 }

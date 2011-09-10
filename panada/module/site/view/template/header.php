@@ -3,6 +3,9 @@
     >
 <html lang="en">
 <head>
+<?php if( ! $this->session->get('user_id') ):?>
+<script type="text/javascript" src="http://talked.in/api/js/cda.js"></script>
+<?php endif; ?>
 <title><?php echo $site->title;?></title>
 <link rel="stylesheet" href="<?php echo $this->location('statics/forum/css/forum.css');?>" type="text/css" media="screen" />
 </head>
