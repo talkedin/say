@@ -21,7 +21,7 @@ class Controller_api extends Panada {
         header('Content-type: text/javascript');
         
         if( $user_id = $this->session->get('user_id') ){
-            echo 'top.location.href = \'http://talked.in/signin?next=\'+encodeURIComponent(location.href);';
+            echo 'top.location.href = \'http://talked.in/accounts/signin?next=\'+encodeURIComponent(location.href);';
         }
     }
 }

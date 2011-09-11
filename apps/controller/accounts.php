@@ -1,28 +1,34 @@
 <?php defined('THISPATH') or die('Can\'t access directly!');
 
-class Controller_signin extends Panada {
+/**
+ * Cookie seperti _cd (cross domain) hanya digunakan pada saat
+ * signout, agar lebih efisien, deklarasi cookie _cd ini diberlakukan
+ * hanya untuk path /acconts. Dengan alasan inilah semua method
+ * di bawah berada dalam satu class ini.
+ */
+class Controller_accounts extends Panada {
+    
+    private $cookie_site_ids = '_cd';
     
     public function __construct(){
         
         parent::__construct();
         
         $this->users        = new Model_users;
-        $this->site_info    = new Model_site_info;
         $this->request      = new Library_request;
         $this->validation   = new Library_validation;
-        $this->session      = new Library_session;
         $this->cache        = new Library_cache('memcached');
+        $this->session      = new Library_session;
+        $this->site_info    = new Model_site_info;
     }
     
-    public function index(){
+    /**
+     * Method untuk proses signin
+     */
+    public function signin(){
         
         $views['is_error'] = false;
         $auth_key = 'auth_key_'.md5(session_id().time());
-        $site_name = false;
-        
-        if( $site_name = $this->request->get('next') ){
-            $site_name = parse_url($site_name, PHP_URL_HOST);
-        }
         
         
         // Apakah user sudah dalam keadaaan signedin?
@@ -93,20 +99,18 @@ class Controller_signin extends Panada {
         $this->html_redirect($location);
     }
     
-    private function html_redirect($location){
+    private function html_redirect($location, $signout_other = false, $is_top = true){
         
-        $this->output('redirect', array('location' => $location, 'is_top' => true, 'signout_other' => false) );
+        $this->output('redirect', array('location' => $location, 'is_top' => $is_top, 'signout_other' => $signout_other) );
         exit;
     }
     
     private function defined_signined_cooke($site_id){
         
-        $cookie_name = 'DSC';
-        
         $sites = array();
         
-        if( isset($_COOKIE[$cookie_name] ) )
-            $sites = explode(',', $_COOKIE[$cookie_name]);
+        if( isset($_COOKIE[$this->cookie_site_ids] ) )
+            $sites = explode(',', $_COOKIE[$this->cookie_site_ids]);
         
         if( in_array($site_id, $sites) )
             return;
@@ -115,6 +119,47 @@ class Controller_signin extends Panada {
         
         $sites = implode(',', $sites);
         
-        setcookie($cookie_name, $sites, 0, '/', 'talked.in');
+        setcookie($this->cookie_site_ids, $sites, 0, '/accounts/', 'talked.in');
+    }
+    
+    private function undefined_signed_cookie(){
+        
+        if( ! isset($_COOKIE[$this->cookie_site_ids] ) )
+            return false;
+        
+        $sites          = explode(',', $_COOKIE[$this->cookie_site_ids]);
+        $signout_other  = $this->site_info->find_in($sites);
+        
+        setcookie($this->cookie_site_ids, null, time() - 3600, '/accounts/', 'talked.in');
+        
+        return $signout_other;
+    }
+    
+    /**
+     * Method untuk proses signout.
+     */
+    public function signout(){
+        
+        $this->session->session_clear_all();
+        $signout_other = $this->undefined_signed_cookie();
+        
+        $location = ( $this->request->get('next') ) ? urldecode($this->request->get('next')) : 'http://talked.in/';
+        
+        $host       = parse_url($location, PHP_URL_HOST);
+        $arr        = explode('.', $host);
+        $max_key    = count($arr) - 1;
+        
+        if( $arr[$max_key -1].'.'.$arr[$max_key] == 'talked.in' )
+            $this->html_redirect($location, $signout_other, false);
+        
+        $location = 'http://'.$host.'/cda/signout?next='.urlencode($location);
+        $this->html_redirect($location, $signout_other, false);
+    }
+    
+    /**
+     * Method untuk proses signup.
+     */
+    public function signup(){
+        
     }
 }
