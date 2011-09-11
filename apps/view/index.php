@@ -6,7 +6,7 @@
             <span>talked.in</span>
         </div>
         <div class="float_r">
-            <span><a href="<?php echo $this->location('signin');?>">Sign In</a> | <a href="<?php echo $this->location('signup');?>">Sign Up</a></span>
+            <span><a href="<?php echo $this->location('accounts/signin');?>">Sign In</a> | <a href="<?php echo $this->location('accounts/signup');?>">Sign Up</a></span>
         </div>
     </div>
 </div>
