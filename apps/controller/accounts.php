@@ -81,7 +81,7 @@ class Controller_accounts extends Panada {
         if( is_numeric($user) )
             $user = $this->users->find_one( array('user_id' => $user) );
         
-        $this->cache->set_value($auth_key, $user, 300);
+        $this->cache->set_value($auth_key, $user, 120);
         
         $location   = ( $this->request->get('next') ) ? urldecode($this->request->get('next')) : 'http://talked.in/';
         $host       = parse_url($location, PHP_URL_HOST);
@@ -105,6 +105,13 @@ class Controller_accounts extends Panada {
         exit;
     }
     
+    /**
+     * Mendaftarkan setiap site id untuk site yang
+     * di mana user sudah signin.
+     *
+     * @param int $site_id
+     * @return void
+     */
     private function defined_signined_cooke($site_id){
         
         $sites = array();
@@ -122,6 +129,13 @@ class Controller_accounts extends Panada {
         setcookie($this->cookie_site_ids, $sites, 0, '/accounts/', 'talked.in');
     }
     
+    /**
+     * Mendapatkan informasi site-site mana saja yang sudah
+     * signin bagi user, dimana informasi ini akan digunakan untuk
+     * melakukan proses signout sekaligus untuk semua site
+     * yang sudah terdaftar. Setelah informasi ini didapat,
+     * kemudian cookie akan dihapus.
+     */
     private function undefined_signed_cookie(){
         
         if( ! isset($_COOKIE[$this->cookie_site_ids] ) )
@@ -161,5 +175,80 @@ class Controller_accounts extends Panada {
      */
     public function signup(){
         
+        // Apakah user sudah dalam keadaaan signedin?
+        if( $user_id = $this->session->get('user_id') ){
+            $this->sso_signin($user_id, $auth_key);
+            return;
+        }
+        
+        if( $this->request->post('submit') ){
+            
+            $username = trim($this->request->post('username'));
+            $email = strtolower(trim($this->request->post('email')));
+            $password = trim($this->request->post('password'));
+            
+            $salt = rand();
+            $password = md5( md5($password) . $salt );
+            
+            $data = array(
+                'username' => $username,
+                'email' => $email,
+                'password' => $password,
+                'salt' => $salt,
+            );
+            
+            $this->users->add_new($data);
+        }
+        
+        $this->output('accounts/signup');
+    }
+    
+    /**
+     * Method untuk proses lupa password/username.
+     */
+    public function forgot(){
+        
+        // Apakah user sudah dalam keadaaan signedin?
+        if( $user_id = $this->session->get('user_id') ){
+            $this->sso_signin($user_id, $auth_key);
+            return;
+        }
+        
+        if( $uname = $this->requset->post('uname') && $this->requset->post('submit') ){
+            
+            $args = array('username' => $uname);
+            
+            if( $email = $this->validation->is_email($uname) ){
+                $args = array('email' => $email);
+            }
+            
+            if( $user = $this->users->find_one($args) ){
+                
+                $access_key = md5(session_id . time() . $user->user_id . $user->email);
+                
+                $this->cache->set_value($access_key, $user, 7200);
+                
+                // kemudian kirim email yg berisi kode url unik untuk merubah password
+                // http://talked.in/accounts/forgot/recovery?ak=$access_key
+                // Url ini hanya berlaku untuk 2 jam
+            }
+        }
+    }
+    
+    /**
+     * Method untuk proses recovery password/input passsword baru.
+     */
+    public function recovery(){
+        
+        $access_key = $this->requset->get('ak');
+        
+        // Beri 404 jika access key tidak valid.
+        if( ! $user = $this->cache->get_value($access_key) )
+            Library_error::_404();
+        
+        // Pastikan data tidak expired setelah user membuka halaman ini.
+        $this->cache->set_value($access_key, $user, 7200);
+        
+        // Tampilkan form merubah password
     }
 }
