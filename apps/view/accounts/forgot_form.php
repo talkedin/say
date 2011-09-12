@@ -11,15 +11,11 @@
     <?php endif; ?>
     <form action="" method="post">
         Email or Username:<br />
-        <input type="text" id="uname" name="uname" /><br />
-        Password:<br />
-        <input type="password" name="pass" /><br />
-        Remember me: <input type="checkbox" name="rem" value="1" /><br />
-        <input type="submit" value="Sign In" name="signin" />
+        <input type="text" id="uname" name="uname" />
+        <input type="submit" value="Submit" name="submit" />
     </form>
     <script type="text/javascript">
         document.getElementById('uname').focus();
     </script>
-    <p><a href="<?php echo $this->location('accounts/forgot');?>">Forgot</a> your password/email ?</p>
 </body>
 </html>

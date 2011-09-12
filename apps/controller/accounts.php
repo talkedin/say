@@ -214,7 +214,9 @@ class Controller_accounts extends Panada {
             return;
         }
         
-        if( $uname = $this->requset->post('uname') && $this->requset->post('submit') ){
+        $views['is_error'] = false;
+        
+        if( $uname = $this->request->post('uname') && $this->request->post('submit') ){
             
             $args = array('username' => $uname);
             
@@ -233,6 +235,8 @@ class Controller_accounts extends Panada {
                 // Url ini hanya berlaku untuk 2 jam
             }
         }
+        
+        $this->output('accounts/forgot_form', $views);
     }
     
     /**
